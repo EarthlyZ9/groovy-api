@@ -62,15 +62,15 @@ ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
@@ -228,8 +228,8 @@ TIME_ZONE = "Asia/Seoul"
 
 
 # Max upload size
-DATA_UPLOAD_MAX_MEMORY_SIZE = 12 * 1024 * 1024 # 12MB
-FILE_UPLOAD_MAX_MEMORY_SIZE = 12 * 1024 * 1024 # 12MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 12 * 1024 * 1024  # 12MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 12 * 1024 * 1024  # 12MB
 
 
 # Static files (CSS, JavaScript, Images)
