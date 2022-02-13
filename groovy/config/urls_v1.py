@@ -15,7 +15,7 @@ api_info = openapi.Info(
     contact=openapi.Contact(email="nsong.lim@gmail.com"),
     license=openapi.License(name="BSD License"),
 )
-schema_view = get_schema_view(
+SchemaView = get_schema_view(
     api_info,
     public=True,
     permission_classes=(permissions.AllowAny,),
@@ -38,13 +38,13 @@ urlpatterns = [
 urlpatterns += [
     re_path(
         r"^docs/$",
-        schema_view.with_ui("swagger", cache_timeout=0),
+        SchemaView.with_ui("swagger", cache_timeout=0),
         name="schema-swagger-ui",
     ),
 ]
 
 
-def health_check_view(request):
+def health_check_view():
     return HttpResponse(status=200)
 
 
