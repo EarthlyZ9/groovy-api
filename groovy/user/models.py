@@ -34,9 +34,7 @@ class UserManager(BaseUserManager):
         user.set_password(password)
 
         user.save(using=self._db)
-        logging.info(
-            f"User [{user.id}] 회원가입"
-        )
+        logging.info(f"User [{user.id}] 회원가입")
         return user
 
     def create_superuser(self, email, password, **extra_fields):
