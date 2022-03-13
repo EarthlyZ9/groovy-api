@@ -75,41 +75,60 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
         (FEMALE, "FEMALE"),
     )
 
+    ADMISSION_YEAR = [(r,r) for r in range(2000, datetime.now().year+2)]
+
+    FRESHMEN = 1
+    SOPHOMORE = 2
+    JUNIOR = 3
+    SENIOR = 4
+    GRADE_CHOICES = (
+        (FRESHMEN, 1),
+        (SOPHOMORE, 2),
+        (JUNIOR, 3),
+        (SENIOR, 4),
+    )
+
+    OTHER = '기타'
+    DELETE_REASONS = (
+        (OTHER, _('기타')),
+    )
+
     id = models.BigAutoField(primary_key=True)
-    email = models.EmailField(
-        max_length=64, unique=True, null=True, help_text="used as username"
-    )
-
-    name = models.CharField(max_length=20, blank=True, default="", help_text="실명")
-    nickname = models.CharField(
-        max_length=20, blank=True, default="", help_text="서비스 상에서 사용되는 이름"
-    )
-
+    email = models.EmailField(max_length=64, unique=True, null=True)
+    name = models.CharField(max_length=20, blank=True, default="", help_pytext="실명")
+    nickname = models.CharField(max_length=20, blank=True, default="", help_text="서비스 상에서 사용되는 이름")
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default=NONE)
-    age_range = models.CharField(max_length=8, blank=True, default="")
-    phone_number = models.CharField(
-        max_length=20, blank=True, default="", help_text="+82 10-XXXX-XXXX"
-    )
+    birth_date = models.DateTimeField()
+
+    university_id = models.ForeignKey('University', on_delete=models.DO_NOTHING)
+    is_university_confirmed = models.BooleanField(default=False)
+    university_confirmed_at = models.DateTimeField()
+
+    admission_class = models.SmallIntegerField(choices=ADMISSION_YEAR, default=datetime.now().year)
+    grade = models.CharField(choices=GRADE_CHOICES)
+
     profile_image_url = models.URLField(max_length=256, blank=True, default="")
     thumbnail_image_url = models.URLField(max_length=256, blank=True, default="")
 
     is_service_terms_agreed = models.BooleanField(default=False)
+    is_push_allowed = models.BooleanField(default=False)
+    push_id = models.CharField()
 
-    is_staff = models.BooleanField(
-        _("staff status"),
-        default=False,
-    )
-    is_active = models.BooleanField(
-        _("active"),
-        default=True,
-    )
-    date_joined = models.DateTimeField(_("date joined"), default=datetime.now)
+    login_attempt_at = models.DateTimeField()
+    last_login_at = models.DateTimeField()
+
+    app_version = models.CharField()
+    auth_token = models.CharField()
+
+    is_deleted = models.BooleanField(default=False)
+    deleted_reason = models.CharField(choices=DELETE_REASONS, blank=True, null=True)
+    deleted_at = models.DateTimeField()
 
     objects = UserManager()
 
     EMAIL_FIELD = "email"
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["nickname"]
+    REQUIRED_FIELDS = ["nickname", "name"]
 
     class Meta:
         unique_together = ["email"]
@@ -132,3 +151,21 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Send an email to this user."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
+
+
+class UserSuggestion(TimeStampMixin):
+
+    OTHER = '기타'
+    SUGGESTION_TYPES = (
+        (OTHER, _('기타'))
+    )
+
+    id = models.BigAutoField(primary_key=True)
+    user_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    suggestion_type = models.CharField()
+    content = models.TextField()
+
+
+class University(TimeStampMixin):
+    id = models.BigAutoField(primary_key=True)
+    name = models.CharField()
