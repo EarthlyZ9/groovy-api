@@ -1,6 +1,6 @@
 import logging
 from django.db import models
-from user.models import User, TimeStampMixin
+from groovy.user.models import User, TimeStampMixin
 
 
 class Friend(TimeStampMixin):
