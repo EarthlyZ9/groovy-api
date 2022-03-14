@@ -1,7 +1,7 @@
 import logging
 from django.db import models
-from user.models import User, TimeStampMixin
-from group.models import Group
+from groovy.user.models import User, TimeStampMixin
+from groovy.group.models import Group
 
 
 class GroupChatroom(TimeStampMixin):
