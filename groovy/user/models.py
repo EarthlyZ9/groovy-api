@@ -66,11 +66,10 @@ class TimeStampMixin(models.Model):
 
 class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
 
-    NONE = "X"
-    MALE = "M"
-    FEMALE = "F"
+    MALE = "MALE"
+    FEMALE = "FEMALE"
     GENDER_CHOICES = (
-        (NONE, "None"),
+        (None, "NONE"),
         (MALE, "MALE"),
         (FEMALE, "FEMALE"),
     )
@@ -97,7 +96,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
     email = models.EmailField(max_length=64, unique=True, null=True)
     name = models.CharField(max_length=20, default="", help_text="실명")
     nickname = models.CharField(max_length=20, blank=True, default="", help_text="서비스 상에서 사용되는 이름")
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default=NONE)
+    gender = models.CharField(max_length=8, choices=GENDER_CHOICES)
     birth_date = models.DateTimeField()
 
     university = models.ForeignKey('University', on_delete=models.DO_NOTHING)
@@ -112,13 +111,13 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
 
     is_service_terms_agreed = models.BooleanField(default=False)
     is_push_allowed = models.BooleanField(default=False)
-    push_id = models.CharField(null=True)
+    push_id = models.CharField(null=True, max_length=64)
 
     login_attempt_at = models.DateTimeField(null=True)
     last_login_at = models.DateTimeField(null=True)
 
-    app_version = models.CharField(null=True)
-    auth_token = models.CharField(null=True)
+    app_version = models.CharField(null=True, max_length=16)
+    auth_token = models.CharField(null=True, max_length=128)
 
     is_deleted = models.BooleanField(default=False)
     deleted_reason = models.CharField(choices=DELETE_REASONS, max_length=255, blank=True, null=True)
@@ -131,6 +130,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
     REQUIRED_FIELDS = ["nickname"]
 
     class Meta:
+        db_table = "user"
         unique_together = ["email"]
         verbose_name = _("user")
         verbose_name_plural = _("users")
@@ -162,10 +162,16 @@ class UserSuggestion(TimeStampMixin):
 
     id = models.BigAutoField(primary_key=True)
     user_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    suggestion_type = models.CharField(max_length=100)
+    suggestion_type = models.CharField(max_length=16)
     content = models.TextField()
+
+    class Meta:
+        db_table = 'user_suggestion'
 
 
 class University(TimeStampMixin):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=50)
+
+    class Meta:
+        db_table = 'university'

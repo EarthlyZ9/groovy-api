@@ -37,6 +37,9 @@ THIRD_PARTY_APPS = [
 ]
 CODOT_APPS = [
     "user",
+    "friend",
+    "group",
+    "chat",
 ]
 INSTALLED_APPS = DJANGO_CORE_APPS + THIRD_PARTY_APPS + CODOT_APPS
 
@@ -79,7 +82,7 @@ TEMPLATES = [
 # Database
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
+        "ENGINE": "django.db.backends.mysql",
         "HOST": get_env_value("DB_HOST"),
         "PORT": get_env_value("DB_PORT"),
         "NAME": get_env_value("DB_NAME"),
@@ -93,7 +96,7 @@ DATABASES = {
 # Database for test
 if "test" in sys.argv:
     DATABASES["default"] = {
-        "ENGINE": "django.db.backends.sqlite3",
+        "ENGINE": "django.db.backends.mysql",
         "HOST": get_env_value("TEST_DB_HOST"),
         "PORT": get_env_value("TEST_DB_PORT"),
         "NAME": get_env_value("TEST_DB_NAME"),

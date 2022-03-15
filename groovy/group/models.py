@@ -1,41 +1,57 @@
-import logging
-from datetime import datetime
 from django.db import models
-from groovy.user.models import User, TimeStampMixin
-from django.utils.translation import gettext_lazy as _
+from user.models import User, TimeStampMixin
 
 
 class Group(TimeStampMixin):
     id = models.BigAutoField(primary_key=True)
-    manager_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    title = models.CharField(max_length=255)
-    content = models.TextField()
-    quota = models.SmallIntegerField(null=True)
-    is_no_quota = models.BooleanField(default=False)
-    is_approval_process = models.BooleanField(default=True)
+    manager = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="managing_groups")
+    title = models.CharField(max_length=32)
+    content = models.CharField(max_length=1000)
+    quota = models.PositiveSmallIntegerField(null=True)
+    has_no_quota = models.BooleanField(default=False)
+    is_approval_needed = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'group'
 
     def __repr__(self):
         return f"Group({self.id}, {self.title})"
 
 
-class JoinRequest(TimeStampMixin):
+class GroupJoinRequest(TimeStampMixin):
+
+    REFUSED = "REFUSED"
+    ACCEPTED = "ACCEPTED"
+    PENDING = "PENDING"
+    REQUEST_STATUS = (
+        (REFUSED, "REFUSED"),
+        (ACCEPTED, "ACCEPTED"),
+        (PENDING, "PENDING"),
+    )
+
     id = models.BigAutoField(primary_key=True)
     requester = models.ForeignKey(User, on_delete=models.CASCADE)
-    group_id = models.ForeignKey(Group, on_delete=models.CASCADE)
-    is_approved = models.BooleanField(default=False)
-    approved_at = models.DateTimeField()
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    status = models.CharField(choices=REQUEST_STATUS, max_length=15)
+    status_changed_at = models.DateTimeField()
+
+    class Meta:
+        db_table = 'group_join_request'
 
     def __repr__(self):
-        return f"JoinRequest(id={self.group_id}, user={self.user_id}, to={self.group_id})"
+        return f"JoinRequest(id={self.id}, user={self.user_id}, to={self.group_id})"
 
 
 class GroupMember(TimeStampMixin):
     id = models.BigAutoField(primary_key=True)
-    group_id = models.ForeignKey(Group, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
     member = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    class Meta:
+        db_table = 'group_member'
+
     def __repr__(self):
-        return f"GroupMember(id={self.group_id}, group={self.group_id}, member={self.user_id})"
+        return f"GroupMember(id={self.id}, group={self.group_id}, member={self.user_id})"
 
 
 

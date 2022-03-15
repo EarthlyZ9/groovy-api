@@ -1,12 +1,9 @@
-from http.client import responses
 from rest_framework import mixins, generics
-from django.contrib.auth.models import User
-from rest_framework import permissions, renderers
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
-from groovy.user.models import User, University, UserSuggestion
-from groovy.user.serializers import UserSerializer, UniversitySerializer
+from user.models import User, University, UserSuggestion
+from user.serializers import UserSerializer, UniversitySerializer
 
 # Create your views here.
 """
