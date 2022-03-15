@@ -95,40 +95,40 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
 
     id = models.BigAutoField(primary_key=True)
     email = models.EmailField(max_length=64, unique=True, null=True)
-    name = models.CharField(max_length=20, blank=True, default="", help_pytext="실명")
+    name = models.CharField(max_length=20, default="", help_text="실명")
     nickname = models.CharField(max_length=20, blank=True, default="", help_text="서비스 상에서 사용되는 이름")
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, default=NONE)
     birth_date = models.DateTimeField()
 
-    university_id = models.ForeignKey('University', on_delete=models.DO_NOTHING)
+    university = models.ForeignKey('University', on_delete=models.DO_NOTHING)
     is_university_confirmed = models.BooleanField(default=False)
     university_confirmed_at = models.DateTimeField()
 
     admission_class = models.SmallIntegerField(choices=ADMISSION_YEAR, default=datetime.now().year)
-    grade = models.CharField(choices=GRADE_CHOICES)
+    grade = models.SmallIntegerField(choices=GRADE_CHOICES)
 
     profile_image_url = models.URLField(max_length=256, blank=True, default="")
     thumbnail_image_url = models.URLField(max_length=256, blank=True, default="")
 
     is_service_terms_agreed = models.BooleanField(default=False)
     is_push_allowed = models.BooleanField(default=False)
-    push_id = models.CharField()
+    push_id = models.CharField(null=True)
 
-    login_attempt_at = models.DateTimeField()
-    last_login_at = models.DateTimeField()
+    login_attempt_at = models.DateTimeField(null=True)
+    last_login_at = models.DateTimeField(null=True)
 
-    app_version = models.CharField()
-    auth_token = models.CharField()
+    app_version = models.CharField(null=True)
+    auth_token = models.CharField(null=True)
 
     is_deleted = models.BooleanField(default=False)
-    deleted_reason = models.CharField(choices=DELETE_REASONS, blank=True, null=True)
+    deleted_reason = models.CharField(choices=DELETE_REASONS, max_length=255, blank=True, null=True)
     deleted_at = models.DateTimeField()
 
     objects = UserManager()
 
     EMAIL_FIELD = "email"
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["nickname", "name"]
+    REQUIRED_FIELDS = ["nickname"]
 
     class Meta:
         unique_together = ["email"]
@@ -162,10 +162,10 @@ class UserSuggestion(TimeStampMixin):
 
     id = models.BigAutoField(primary_key=True)
     user_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    suggestion_type = models.CharField()
+    suggestion_type = models.CharField(max_length=100)
     content = models.TextField()
 
 
 class University(TimeStampMixin):
     id = models.BigAutoField(primary_key=True)
-    name = models.CharField()
+    name = models.CharField(max_length=50)

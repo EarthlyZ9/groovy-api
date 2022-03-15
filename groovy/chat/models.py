@@ -16,7 +16,7 @@ class GroupChat(TimeStampMixin):
     id = models.BigAutoField(primary_key=True)
     chatroom_id = models.ForeignKey(GroupChatroom, on_delete=models.CASCADE)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    content = models.TextField()
+    content = models.CharField(max_length=1000)
 
     def __repr__(self):
         return f"GroupChat(id={self.id}, chatroom={self.chatroom_id}, user={self.user_id})"
@@ -24,9 +24,9 @@ class GroupChat(TimeStampMixin):
 
 class RegularChat(TimeStampMixin):
     id = models.BigAutoField(primary_key=True)
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sender")
-    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="receiver")
-    content = models.TextField()
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="regular_chat_sender")
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="regular_chat_receiver")
+    content = models.CharField(max_length=1000)
 
     def __repr__(self):
         return f"RegularChat(id={self.id}, sender={self.sender}, receiver={self.receiver})"

@@ -32,7 +32,7 @@ admin.site.empty_value_display = "비어있음"
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
-    path("user/", include("urls.py")),
+    path("user/", include("user.urls")),
 ]
 
 urlpatterns += [

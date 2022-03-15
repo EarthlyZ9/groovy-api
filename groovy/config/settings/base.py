@@ -79,7 +79,7 @@ TEMPLATES = [
 # Database
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
+        "ENGINE": "django.db.backends.sqlite3",
         "HOST": get_env_value("DB_HOST"),
         "PORT": get_env_value("DB_PORT"),
         "NAME": get_env_value("DB_NAME"),
@@ -93,7 +93,7 @@ DATABASES = {
 # Database for test
 if "test" in sys.argv:
     DATABASES["default"] = {
-        "ENGINE": "django.db.backends.postgresql",
+        "ENGINE": "django.db.backends.sqlite3",
         "HOST": get_env_value("TEST_DB_HOST"),
         "PORT": get_env_value("TEST_DB_PORT"),
         "NAME": get_env_value("TEST_DB_NAME"),

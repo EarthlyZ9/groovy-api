@@ -20,7 +20,7 @@ class Group(TimeStampMixin):
 
 class JoinRequest(TimeStampMixin):
     id = models.BigAutoField(primary_key=True)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    requester = models.ForeignKey(User, on_delete=models.CASCADE)
     group_id = models.ForeignKey(Group, on_delete=models.CASCADE)
     is_approved = models.BooleanField(default=False)
     approved_at = models.DateTimeField()
@@ -32,7 +32,7 @@ class JoinRequest(TimeStampMixin):
 class GroupMember(TimeStampMixin):
     id = models.BigAutoField(primary_key=True)
     group_id = models.ForeignKey(Group, on_delete=models.CASCADE)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    member = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __repr__(self):
         return f"GroupMember(id={self.group_id}, group={self.group_id}, member={self.user_id})"
