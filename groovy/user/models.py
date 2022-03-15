@@ -24,7 +24,6 @@ class UserManager(BaseUserManager):
         """
         Create and save a User with the given email and password.
         """
-        extra_fields.setdefault("is_staff", False)
         extra_fields.setdefault("is_superuser", False)
 
         if not email:
@@ -41,11 +40,11 @@ class UserManager(BaseUserManager):
         """
         Create and save a SuperUser with the given email and password.
         """
-        extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("university_id", 1)
+        extra_fields.setdefault("admission_class", 2018)
+        extra_fields.setdefault("grade", User.FRESHMEN)
 
-        if extra_fields.get("is_staff") is not True:
-            raise ValueError("Superuser must have is_staff=True.")
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superuser must have is_superuser=True.")
 
@@ -97,11 +96,11 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
     name = models.CharField(max_length=20, default="", help_text="실명")
     nickname = models.CharField(max_length=20, blank=True, default="", help_text="서비스 상에서 사용되는 이름")
     gender = models.CharField(max_length=8, choices=GENDER_CHOICES)
-    birth_date = models.DateTimeField()
+    birth_date = models.DateField(null=True)
 
     university = models.ForeignKey('University', on_delete=models.DO_NOTHING)
     is_university_confirmed = models.BooleanField(default=False)
-    university_confirmed_at = models.DateTimeField()
+    university_confirmed_at = models.DateTimeField(null=True)
 
     admission_class = models.SmallIntegerField(choices=ADMISSION_YEAR, default=datetime.now().year)
     grade = models.SmallIntegerField(choices=GRADE_CHOICES)
@@ -121,7 +120,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
 
     is_deleted = models.BooleanField(default=False)
     deleted_reason = models.CharField(choices=DELETE_REASONS, max_length=255, blank=True, null=True)
-    deleted_at = models.DateTimeField()
+    deleted_at = models.DateTimeField(null=True)
 
     objects = UserManager()
 

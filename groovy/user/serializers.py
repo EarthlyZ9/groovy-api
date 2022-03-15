@@ -52,6 +52,28 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
 
+class ManagerSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "nickname",
+            "profile_image_url",
+            "thumbnail_image_url",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = [
+            "id",
+            "nickname",
+            "profile_image_url",
+            "thumbnail_image_url",
+            "created_at",
+            "updated_at",
+        ]
+
+
 class MiniUserSerializer(serializers.ModelSerializer):
     """
     mini-Serializer class for short description of User.
