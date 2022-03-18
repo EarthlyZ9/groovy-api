@@ -37,7 +37,7 @@ class RegularChat(TimeStampMixin):
         db_table = 'regular_chat'
 
     def __repr__(self):
-        return f"RegularChat(id={self.id}, sender={self.sender_id}, receiver={self.receiver_id})"
+        return f"RegularChat(id={self.id}, sender={self.sender}, receiver={self.receiver})"
 
 
 

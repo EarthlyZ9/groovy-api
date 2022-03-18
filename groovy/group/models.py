@@ -30,7 +30,7 @@ class GroupJoinRequest(TimeStampMixin):
     )
 
     id = models.BigAutoField(primary_key=True)
-    requester = models.ForeignKey(User, on_delete=models.CASCADE)
+    requestor = models.ForeignKey(User, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     status = models.CharField(choices=REQUEST_STATUS, max_length=15)
     status_changed_at = models.DateTimeField()
@@ -39,7 +39,7 @@ class GroupJoinRequest(TimeStampMixin):
         db_table = 'group_join_request'
 
     def __repr__(self):
-        return f"JoinRequest(id={self.id}, user={self.user_id}, to={self.group_id})"
+        return f"JoinRequest(id={self.id}, user={self.requestor}, to={self.group})"
 
 
 class GroupMember(TimeStampMixin):
@@ -51,7 +51,7 @@ class GroupMember(TimeStampMixin):
         db_table = 'group_member'
 
     def __repr__(self):
-        return f"GroupMember(id={self.id}, group={self.group_id}, member={self.user_id})"
+        return f"GroupMember(id={self.id}, group={self.group}, member={self.member})"
 
 
 
