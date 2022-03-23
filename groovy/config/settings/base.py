@@ -34,6 +34,7 @@ THIRD_PARTY_APPS = [
     "drf_yasg",
     "rest_framework",
     "corsheaders",
+    "django_extensions",
 ]
 CODOT_APPS = [
     "user",
@@ -159,9 +160,9 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.BasicAuthentication",
     ),
-    "DEFAULT_RENDERER_CLASSES": [
-        'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
-    ],
+    #"DEFAULT_RENDERER_CLASSES": [
+       # 'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
+    #],
     "DEFAULT_PARSER_CLASSES": [
         "rest_framework.parsers.JSONParser",
         "rest_framework.parsers.FormParser",
