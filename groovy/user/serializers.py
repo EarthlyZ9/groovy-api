@@ -66,7 +66,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class SimplifiedUserSerializer(serializers.HyperlinkedModelSerializer):
-    university_id = MiniUniversitySerializer(read_only=True)
+    university = MiniUniversitySerializer(read_only=True)
 
     class Meta:
         model = User
@@ -75,7 +75,7 @@ class SimplifiedUserSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "email",
             "nickname",
-            "university_id",
+            "university",
             "admission_class",
             "grade",
             "profile_image_url",
@@ -86,12 +86,13 @@ class SimplifiedUserSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "email",
             "nickname",
-            "university_id",
+            "university",
             "admission_class",
             "grade",
             "profile_image_url",
             "thumbnail_image_url",
         ]
+
 
 
 
