@@ -4,7 +4,7 @@ from user.models import User, TimeStampMixin
 
 class Friend(TimeStampMixin):
     id = models.BigAutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friend_user")
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friend_user")
     friend_id = models.ManyToManyField(User, related_name="friends")
 
     class Meta:
@@ -35,8 +35,7 @@ class FriendRequest(TimeStampMixin):
         db_table = 'friend_request'
 
     def __repr__(self):
-        return f"FriendRequest(id={self.id}, from={self.request_from_id}, to={self.request_to_id})"
-
+        return f"FriendRequest(id={self.id}, from={self.request_from}, to={self.request_to})"
 
 
 
