@@ -122,6 +122,14 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
     deleted_reason = models.CharField(choices=DELETE_REASONS, max_length=255, blank=True, null=True)
     deleted_at = models.DateTimeField(null=True)
 
+    is_staff = models.BooleanField(
+        _("staff status"),
+        default=False,
+        help_text=_("Designates whether the user can log into this admin site."),
+    )
+
+    #  TODO: super user is_staff issue 해결
+
     objects = UserManager()
 
     EMAIL_FIELD = "email"
@@ -174,3 +182,6 @@ class University(TimeStampMixin):
 
     class Meta:
         db_table = 'university'
+
+
+

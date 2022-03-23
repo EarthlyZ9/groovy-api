@@ -5,10 +5,25 @@ from user.models import University
 User = get_user_model()
 
 
+class UniversitySerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = University
+        fields = ["id", "name", "created_at", "updated_at"]
+        read_only_fields = ["id", "name", "created_at", "updated_at"]
+
+
+class MiniUniversitySerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = University
+        fields = ["url", "id", "name"]
+        read_only_fields = ["url", "id", "name"]
+
+
 class UserSerializer(serializers.HyperlinkedModelSerializer):
-    """
-    Serializer class for User model.
-    """
+
+    university = MiniUniversitySerializer(read_only=True)
 
     class Meta:
         model = User
@@ -17,8 +32,8 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             "email",
             "name",
             "nickname",
-            "gender"
-            "university_id",
+            "gender",
+            "university",
             "is_university_confirmed",
             "university_confirmed_at",
             "admission_class",
@@ -36,11 +51,9 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         # api 로 get 만 할 필드
         read_only_fields = [
             "id",
-            "email",
             "name",
             "gender"
             "admission_class",
-            "grade",
             "profile_image_url",
             "thumbnail_image_url",
             "push_id",
@@ -52,42 +65,33 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
 
-class ManagerSerializer(serializers.HyperlinkedModelSerializer):
+class SimplifiedUserSerializer(serializers.HyperlinkedModelSerializer):
+    university_id = MiniUniversitySerializer(read_only=True)
 
     class Meta:
         model = User
         fields = [
+            "url",
             "id",
+            "email",
             "nickname",
+            "university_id",
+            "admission_class",
+            "grade",
             "profile_image_url",
             "thumbnail_image_url",
-            "created_at",
-            "updated_at",
         ]
         read_only_fields = [
+            "url",
             "id",
+            "email",
             "nickname",
+            "university_id",
+            "admission_class",
+            "grade",
             "profile_image_url",
             "thumbnail_image_url",
-            "created_at",
-            "updated_at",
         ]
 
 
-class MiniUserSerializer(serializers.ModelSerializer):
-    """
-    mini-Serializer class for short description of User.
-    """
 
-    class Meta:
-        model = User
-        fields = ["id", "email", "name", "nickname"]
-        read_only_fields = ["id", "email", "name", "nickname"]
-
-
-class UniversitySerializer(serializers.HyperlinkedModelSerializer):
-
-    class Meta:
-        model = University
-        fields = ["id", "name"]
-        read_only_fields = ["id", "name"]
