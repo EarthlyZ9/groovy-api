@@ -5,6 +5,9 @@ from django.urls import path, re_path, include
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from rest_framework.decorators import api_view
+from rest_framework.reverse import reverse
+from rest_framework.response import Response
 
 # API docs
 api_info = openapi.Info(
@@ -28,12 +31,26 @@ admin.site.site_url = "/"
 admin.site.index_title = "서비스 관리"
 admin.site.empty_value_display = "비어있음"
 
+
+@api_view(['GET'])
+def api_root(request, format=None):
+    return Response({
+        'user': reverse('user-root', request=request, format=format),
+        'group': reverse('group-root', request=request, format=format),
+        'chat': reverse('chat-root', request=request, format=format),
+        'friend': reverse('friend-root', request=request, format=format),
+    })
+
+
 # url configuration
 urlpatterns = [
+    path('', api_root),
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
     path("group/", include("group.urls")),
-    path("", include("user.urls")),
+    path("user/", include("user.urls")),
+    path("chat/", include("chat.urls")),
+    path("friend/", include("friend.urls")),
 ]
 
 urlpatterns += [
