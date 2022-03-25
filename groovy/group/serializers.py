@@ -1,11 +1,12 @@
 from rest_framework import serializers
-from group.models import Group, GroupJoinRequest, GroupMember
-from user.serializers import SimplifiedUserSerializer, UserSerializer
+from group.models import Group, GroupJoinRequest, GroupMember, GroupBookmark
+from user.serializers import SimplifiedUserSerializer
 
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
     manager = SimplifiedUserSerializer(read_only=True)
     members = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='group-member-detail')
+    bookmark_count = serializers.IntegerField(source='bookmarks.count', read_only=True)
 
     class Meta:
         model = Group
@@ -18,12 +19,42 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
             "has_no_quota",
             "is_approval_needed",
             "members",
+            "bookmark_count",
             "created_at",
             "updated_at",
         ]
         read_only_fields = [
             "id",
             "manager",
+            "bookmark_count",
+            "created_at",
+            "updated_at",
+        ]
+
+
+class MiniGroupSerializer(serializers.HyperlinkedModelSerializer):
+    manager = SimplifiedUserSerializer(read_only=True)
+
+    class Meta:
+        model = Group
+        fields = [
+            "id",
+            "title",
+            "manager",
+            "quota",
+            "has_no_quota",
+            "is_approval_needed",
+            "created_at",
+            "updated_at",
+        ]
+
+        read_only_fields = [
+            "id",
+            "title",
+            "manager",
+            "quota",
+            "has_no_quota",
+            "is_approval_needed",
             "created_at",
             "updated_at",
         ]
@@ -31,7 +62,7 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 
 class GroupJoinRequestSerializer(serializers.HyperlinkedModelSerializer):
     requestor = SimplifiedUserSerializer(read_only=True)
-    group = GroupSerializer(read_only=True)
+    group = MiniGroupSerializer(read_only=True)
 
     class Meta:
         model = GroupJoinRequest
@@ -61,7 +92,7 @@ class GroupJoinRequestSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class GroupMemberSerializer(serializers.HyperlinkedModelSerializer):
-    # group = GroupSerializer(read_only=True)
+    group = MiniGroupSerializer(read_only=True)
     member = SimplifiedUserSerializer(read_only=True)
 
     class Meta:
@@ -86,4 +117,29 @@ class GroupMemberSerializer(serializers.HyperlinkedModelSerializer):
 
         extra_kwargs = {
             'url': {'view_name': 'group-member-detail'},
+        }
+
+
+class GroupBookmarkSerializer(serializers.HyperlinkedModelSerializer):
+    group = MiniGroupSerializer(read_only=True)
+    user = SimplifiedUserSerializer(read_only=True)
+
+    class Meta:
+        model = GroupBookmark
+        fields = [
+            "url",
+            "id",
+            "group",
+            "user",
+            "created_at",
+            "updated_at"
+        ]
+        read_only_fields = [
+            "url",
+            "id",
+            "created_at",
+            "updated_at"
+        ]
+        extra_kwargs = {
+            'url': {'view_name': 'group-bookmark-detail'},
         }
