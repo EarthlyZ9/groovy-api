@@ -16,15 +16,15 @@ class GroupChatroom(TimeStampMixin):
 
 class GroupChat(TimeStampMixin):
     id = models.BigAutoField(primary_key=True)
-    chatroom_id = models.ForeignKey(GroupChatroom, on_delete=models.CASCADE)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    chatroom = models.ForeignKey(GroupChatroom, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.CharField(max_length=1000)
 
     class Meta:
         db_table = 'group_chat'
 
     def __repr__(self):
-        return f"GroupChat(id={self.id}, chatroom={self.chatroom_id}, user={self.user_id})"
+        return f"GroupChat(id={self.id}, chatroom={self.chatroom}, user={self.user})"
 
 
 class RegularChat(TimeStampMixin):
