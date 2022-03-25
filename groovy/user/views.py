@@ -2,7 +2,7 @@ from rest_framework import mixins, generics
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
 from user.models import User, University
-from user.serializers import UserSerializer, UniversitySerializer, MiniUniversitySerializer, SimplifiedUserSerializer
+from user.serializers import UserSerializer, UniversitySerializer, MiniUniversitySerializer
 
 # Create your views here.
 """
