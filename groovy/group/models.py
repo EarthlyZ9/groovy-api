@@ -54,6 +54,16 @@ class GroupMember(TimeStampMixin):
         return f"GroupMember(id={self.id}, group={self.group}, member={self.member})"
 
 
+class GroupBookmark(TimeStampMixin):
+    id = models.BigAutoField(primary_key=True)
+    user = models.ManyToManyField(User, related_name="bookmarks")
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="bookmarks")
+
+    class Meta:
+        db_table = 'group_bookmark'
+
+    def __repr__(self):
+        return f"GroupBookmark(id={self.id}, user={self.user}, group={self.group})"
 
 
 

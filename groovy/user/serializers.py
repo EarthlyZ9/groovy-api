@@ -24,6 +24,7 @@ class MiniUniversitySerializer(serializers.HyperlinkedModelSerializer):
 class UserSerializer(serializers.HyperlinkedModelSerializer):
 
     university = MiniUniversitySerializer(read_only=True)
+    bookmarks = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='group-bookmark-detail')
 
     class Meta:
         model = User
@@ -40,6 +41,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             "grade",
             "profile_image_url",
             "thumbnail_image_url",
+            "bookmarks",
             "is_push_allowed",
             "push_id",
             "login_attempt_at",
@@ -92,7 +94,4 @@ class SimplifiedUserSerializer(serializers.HyperlinkedModelSerializer):
             "profile_image_url",
             "thumbnail_image_url",
         ]
-
-
-
 

@@ -6,7 +6,8 @@ from .views import (
     GroupJoinRequestList,
     GroupJoinRequestDetail,
     GroupMemberList,
-    GroupMemberDetail
+    GroupMemberDetail, GroupBookmarkList, GroupBookmarkDetail,
+
 )
 
 urlpatterns = [
@@ -17,4 +18,6 @@ urlpatterns = [
     path('group-members/<int:pk>', GroupMemberDetail.as_view(), name="group-member-detail"),
     path('join-requests/', GroupJoinRequestList.as_view(), name="join-request-list"),
     path('join-requests/<int:pk>/', GroupJoinRequestDetail.as_view(), name="join-request-detail"),
+    path('bookmarks/', GroupBookmarkList.as_view(), name='group-bookmark-list'),
+    path('bookmarks/<int:pk>/', GroupBookmarkDetail.as_view(), name='group-bookmark-detail'),
 ]

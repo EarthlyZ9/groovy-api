@@ -128,8 +128,6 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
         help_text=_("Designates whether the user can log into this admin site."),
     )
 
-    #  TODO: super user is_staff issue 해결
-
     objects = UserManager()
 
     EMAIL_FIELD = "email"
@@ -168,7 +166,7 @@ class UserSuggestion(TimeStampMixin):
     )
 
     id = models.BigAutoField(primary_key=True)
-    user_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     suggestion_type = models.CharField(max_length=16)
     content = models.TextField()
 
