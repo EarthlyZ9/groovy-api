@@ -4,16 +4,16 @@ from friend.models import Friend, FriendRequest
 
 
 class FriendSerializer(serializers.HyperlinkedModelSerializer):
-    user_id = SimplifiedUserSerializer(read_only=True)
-    friend_id = SimplifiedUserSerializer(read_only=True)
+    user = SimplifiedUserSerializer(read_only=True)
+    friend = SimplifiedUserSerializer(read_only=True)
 
     class Meta:
         model = Friend
         fields = [
             "url",
             "id",
-            "user_id",
-            "friend_id",
+            "user",
+            "friend",
             "created_at",
             "updated_at",
         ]
