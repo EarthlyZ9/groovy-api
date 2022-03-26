@@ -1,0 +1,21 @@
+Description=gunicorn daemon
+Requires=gunicorn.socket
+After=network.target
+
+[Service]
+Type=notify
+User=ubuntu
+Group=ubuntu
+# another option for an even more restricted service is
+# DynamicUser=yes
+# see http://0pointer.net/blog/dynamic-users-with-systemd.html
+RuntimeDirectory=gunicorn
+WorkingDirectory=/home/ubuntu/groovy-api
+ExecStart=/home/ubuntu/.venv/bin/gunicorn groovy.config.wsgi.deploy:application
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,6 +1,6 @@
 # pylint: skip-file
 from .base import *
-
+from .env import EC2_PRIVATE_IP
 
 WSGI_APPLICATION = "config.wsgi.deploy.application"
 
@@ -10,6 +10,9 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
 ]
+
+if EC2_PRIVATE_IP:
+    ALLOWED_HOSTS.append(EC2_PRIVATE_IP)
 
 SESSION_COOKIE_SECURE = True
 
