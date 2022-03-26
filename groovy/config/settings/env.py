@@ -36,3 +36,4 @@ EC2_PRIVATE_IP = get_ec2_private_ip()
 
 # HOST NAME
 HOST_NAME = get_env_value("HOST")
+API_HOST_NAME = f"api.{HOST_NAME}"

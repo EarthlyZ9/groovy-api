@@ -1,6 +1,6 @@
 # pylint: skip-file
 from .base import *
-from .env import EC2_PRIVATE_IP
+from .env import EC2_PRIVATE_IP, HOST_NAME, API_HOST_NAME
 
 WSGI_APPLICATION = "config.wsgi.deploy.application"
 
@@ -9,6 +9,8 @@ DEBUG = False
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
+    HOST_NAME,
+    API_HOST_NAME
 ]
 
 if EC2_PRIVATE_IP:
