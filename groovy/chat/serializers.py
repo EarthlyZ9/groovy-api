@@ -29,23 +29,23 @@ class GroupChatroomSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class GroupChatSerializer(serializers.HyperlinkedModelSerializer):
-    chatroom_id = GroupChatroomSerializer(read_only=True)
-    user_id = SimplifiedUserSerializer(read_only=True)
+    chatroom = GroupChatroomSerializer(read_only=True)
+    user = SimplifiedUserSerializer(read_only=True)
 
     class Meta:
         model = GroupChat
         fields = [
             "id",
-            "chatroom_id",
-            "user_id",
+            "chatroom",
+            "user",
             "content",
             "created_at",
             "updated_at",
         ]
         read_only_fields = [
             "id",
-            "chatroom_id",
-            "user_id",
+            "chatroom",
+            "user",
             "content",
             "created_at",
             "updated_at",
