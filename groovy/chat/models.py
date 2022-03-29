@@ -5,7 +5,7 @@ from group.models import Group
 
 class GroupChatroom(TimeStampMixin):
     id = models.BigAutoField(primary_key=True)
-    group_id = models.ForeignKey(Group, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'group_chatroom'

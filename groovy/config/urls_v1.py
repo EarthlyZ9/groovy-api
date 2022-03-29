@@ -60,12 +60,3 @@ urlpatterns += [
         name="schema-swagger-ui",
     ),
 ]
-
-
-def health_check_view():
-    return HttpResponse(status=200)
-
-
-urlpatterns += [  # for health-check
-    path("health-check/", health_check_view, name="health-check"),
-]

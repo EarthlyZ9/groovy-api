@@ -1,4 +1,5 @@
 import os
+import requests
 from dotenv import load_dotenv
 from django.core.exceptions import ImproperlyConfigured
 
@@ -16,6 +17,14 @@ def get_env_value(var_name, default=None):
         error_msg = f"Set the {var_name} environment variable"
         raise ImproperlyConfigured(error_msg) from None
 
+def get_ec2_private_ip():
+    try:
+        return requests.get(
+            'http://169.254.169.254/latest/meta-data/local-ipv4',
+            timeout=0.01).text
+    except requests.exceptions.RequestException:
+        return None
+
 
 DJANGO_SETTINGS_MODULE = get_env_value(
     "DJANGO_SETTINGS_MODULE", "config.settings.debug"
@@ -23,5 +32,8 @@ DJANGO_SETTINGS_MODULE = get_env_value(
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", DJANGO_SETTINGS_MODULE)
 
+EC2_PRIVATE_IP = get_ec2_private_ip()
+
 # HOST NAME
 HOST_NAME = get_env_value("HOST")
+API_HOST_NAME = f"api.{HOST_NAME}"
