@@ -32,6 +32,7 @@ class RegularChat(TimeStampMixin):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="regular_chat_sender")
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="regular_chat_receiver")
     content = models.CharField(max_length=1000)
+    is_join_request_message = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'regular_chat'

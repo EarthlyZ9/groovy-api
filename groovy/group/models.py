@@ -3,6 +3,17 @@ from user.models import User, TimeStampMixin
 
 
 class Group(TimeStampMixin):
+
+    OPENED = "OPENED"
+    CLOSED = "CLOSED"
+    FULL = "FULL"
+
+    GROUP_STATUS = (
+        (OPENED, "OPENED"),
+        (CLOSED, "CLOSED"),
+        (FULL, "FULL"),
+    )
+
     id = models.BigAutoField(primary_key=True)
     manager = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="managing_groups")
     title = models.CharField(max_length=32)
@@ -10,6 +21,8 @@ class Group(TimeStampMixin):
     quota = models.PositiveSmallIntegerField(null=True)
     has_no_quota = models.BooleanField(default=False)
     is_approval_needed = models.BooleanField(default=True)
+    status = models.CharField(choices=GROUP_STATUS, default=GROUP_STATUS[0][0], max_length=10)
+    status_changed_at = models.DateTimeField(null=True)
 
     class Meta:
         db_table = 'group'
@@ -30,8 +43,8 @@ class GroupJoinRequest(TimeStampMixin):
     )
 
     id = models.BigAutoField(primary_key=True)
-    requestor = models.ForeignKey(User, on_delete=models.CASCADE)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    requestor = models.ManyToManyField(User, related_name='join_requests')
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='join_requests')
     status = models.CharField(choices=REQUEST_STATUS, max_length=15, default=REQUEST_STATUS[2][0])
     status_changed_at = models.DateTimeField(null=True)
 
@@ -45,7 +58,8 @@ class GroupJoinRequest(TimeStampMixin):
 class GroupMember(TimeStampMixin):
     id = models.BigAutoField(primary_key=True)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="members")
-    member = models.ForeignKey(User, on_delete=models.CASCADE)
+    member = models.ManyToManyField(User, related_name="members")
+    is_manager = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'group_member'

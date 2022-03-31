@@ -35,6 +35,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "corsheaders",
     "django_extensions",
+    "django_filters",
 ]
 CODOT_APPS = [
     "user",
@@ -107,7 +108,7 @@ if "test" in sys.argv:
         "TEST": {"NAME": "test_db"},
     }
 
-
+"""
 # Cache
 CACHE_LOCATION = "redis://localhost:6379/0"
 CACHES = {
@@ -119,6 +120,7 @@ CACHES = {
         },
     }
 }
+"""
 
 
 # use cache for Session
@@ -172,6 +174,8 @@ REST_FRAMEWORK = {
     "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.URLPathVersioning",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+
 }
 
 
