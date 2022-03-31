@@ -11,7 +11,6 @@ from .views import (
 )
 
 urlpatterns = [
-    # path('', GroupApiRoot.as_view(), name="group-root"),
     path('', GroupList.as_view(), name="group-list"),
     path('<int:pk>/', GroupDetail.as_view(), name="group-detail"),
     path('<int:pk>/group-members/', GroupMemberList.as_view(), name="group-member-list"),

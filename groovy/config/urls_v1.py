@@ -31,20 +31,8 @@ admin.site.site_url = "/"
 admin.site.index_title = "서비스 관리"
 admin.site.empty_value_display = "비어있음"
 
-
-@api_view(['GET'])
-def api_root(request, format=None):
-    return Response({
-        'user': reverse('user-root', request=request, format=format),
-        'group': reverse('group-root', request=request, format=format),
-        'chat': reverse('chat-root', request=request, format=format),
-        'friend': reverse('friend-root', request=request, format=format),
-    })
-
-
 # url configuration
 urlpatterns = [
-    path('', api_root),
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
     path("group/", include("group.urls")),
