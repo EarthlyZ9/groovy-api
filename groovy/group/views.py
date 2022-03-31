@@ -1,6 +1,5 @@
 from datetime import datetime
 
-from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions, filters, status
@@ -16,6 +15,7 @@ from group.serializers import (
     GroupBookmarkSerializer
 )
 from group.services import GroupService
+from user.services import NotificationService
 
 
 class GroupList(generics.ListCreateAPIView):
@@ -28,13 +28,14 @@ class GroupList(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(manager=self.request.user)  # when created, add request.user as manager
-
+    """
     def get_queryset(self):
         queryset = Group.objects
         user = self.request.user
         queryset = queryset.filter(manager=user)
         queryset = self.get_serializer_class().setup_eager_loading(queryset)
         return queryset
+    """
 
 
 class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -45,11 +46,12 @@ class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class CreateGroupJoinRequest(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
-        groupId = kwargs.get('pk')
-        group = get_object_or_404(Group, pk=groupId)
+        group_id = kwargs.get('pk')
+        group = get_object_or_404(Group, pk=group_id)
 
-        group = GroupService.create_join_request(request.user, group)
-        ChatService.notify_join_request(request.user, group)
+        GroupService.create_join_request(request.user, group)
+        ChatService.join_request_chat(request.user, group)
+        NotificationService.notify_join_request(request.user, group)
 
         return Response(GroupJoinRequestSerializer(group).data, status=status.HTTP_201_CREATED)
 
@@ -68,6 +70,20 @@ class GroupJoinRequestDetail(generics.RetrieveUpdateAPIView):
         request_id = self.kwargs.get("request_id")
         queryset = GroupJoinRequest.objects.filter(manager=user, request_id=request_id)
         return queryset
+
+    # TODO: Override update method to send notification when accepted/refused
+    """
+    def update(self, request, *args, **kwargs):
+        group_id = kwargs.get('pk')
+        group = get_object_or_404(Group, pk=group_id)
+        status = kwargs.pop('status', False)
+
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+    """
 
     def perform_update(self, serializer):
         serializer.save(status_changed_at=datetime.now())
@@ -129,16 +145,3 @@ class GroupBookmarkDetail(generics.RetrieveDestroyAPIView):
         queryset = GroupBookmark.objects.filter(id=bookmark_id, group_id=group_id)
         return queryset
 
-
-"""
-class GroupApiRoot(generics.GenericAPIView):
-    name = 'Group'
-
-    def get(self, request, *args, **kwargs):
-        return Response({
-            'groups': reverse('group-list', request=request),
-            'group_members': reverse('group-member-list', request=request),
-            'group_join_requests': reverse('join-request-list', request=request),
-            'group_bookmarks': reverse('group-bookmark-list', request=request),
-            })
-"""

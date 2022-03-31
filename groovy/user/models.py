@@ -182,4 +182,33 @@ class University(TimeStampMixin):
         db_table = 'university'
 
 
+class UserNotification(TimeStampMixin):
 
+    FRIEND_REQUEST_RECEIVED = "Friend Request Received"
+    FRIEND_REQUEST_ACCEPTED = "Friend Request Accepted"
+    JOIN_REQUEST_RECEIVED = "Join Request Received"
+    JOIN_REQUEST_ACCEPTED = "Join Request Accepted"
+    JOIN_REQUEST_REFUSED = "Join Request Refused"
+    GENERAL = "General"
+    PROMOTION = "Promotion"
+    OTHER = "Other"
+
+    NOTIFICATION_TYPE = (
+        (FRIEND_REQUEST_RECEIVED, "FRIEND REQUEST RECEIVED"),
+        (FRIEND_REQUEST_ACCEPTED, "FRIEND REQUEST ACCEPTED"),
+        (JOIN_REQUEST_RECEIVED, "JOIN REQUEST RECEIVED"),
+        (JOIN_REQUEST_ACCEPTED, "JOIN REQUEST ACCEPTED"),
+        (JOIN_REQUEST_REFUSED, "JOIN REQUEST REFUSED"),
+        (GENERAL, "GENERAL"),
+        (PROMOTION, "PROMOTION"),
+        (OTHER, "OTHER"),
+    )
+
+    id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    notification_type = models.CharField(choices=NOTIFICATION_TYPE, max_length=30)
+    content = models.CharField(max_length=300)
+    redirect_url = models.URLField(blank=True, null=True, max_length=30)
+
+    class Meta:
+        db_table = 'user_notification'
