@@ -1,18 +1,21 @@
-from rest_framework import generics, permissions, filters, status
-from django.http import Http404
 from datetime import datetime
-from django.db import IntegrityError, transaction
-from chat.models import RegularChat
-from group.permissions import IsManagerOrReadOnly, ManagerOnly, IsBookmarkOwner, IsManagerOrMember
+
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import generics, permissions, filters, status
+from rest_framework.response import Response
+
+from chat.services import ChatService
 from group.models import Group, GroupJoinRequest, GroupMember, GroupBookmark
+from group.permissions import IsManagerOrReadOnly, ManagerOnly, IsBookmarkOwner, IsManagerOrMember
 from group.serializers import (
     GroupSerializer,
     GroupJoinRequestSerializer,
     GroupMemberSerializer,
-    GroupBookmarkSerializer)
-from rest_framework.reverse import reverse
-from rest_framework.response import Response
-from django_filters.rest_framework import DjangoFilterBackend
+    GroupBookmarkSerializer
+)
+from group.services import GroupService
 
 
 class GroupList(generics.ListCreateAPIView):
@@ -41,28 +44,14 @@ class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class CreateGroupJoinRequest(generics.CreateAPIView):
-
-    serializer_class = GroupJoinRequestSerializer
-
     def create(self, request, *args, **kwargs):
-        group = Group.objects.filter(id=self.kwargs.get('pk')).first()
-        user = self.request.user
+        groupId = kwargs.get('pk')
+        group = get_object_or_404(Group, pk=groupId)
 
-        if group:
-            manager = group.manager
-            content = f"'{group.title}' 그룹에 쪼인하고 싶어요!"
-            RegularChat.objects.create(sender=user, receiver=manager, content=content, is_join_request_message=True)
+        group = GroupService.create_join_request(request.user, group)
+        ChatService.notify_join_request(request.user, group)
 
-        with transaction.atomic():
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-    def perform_create(self, serializer):
-        group_id = self.kwargs.get("pk")
-        serializer.save(requestor=self.request.user, group_id=group_id)
+        return Response(GroupJoinRequestSerializer(group).data, status=status.HTTP_201_CREATED)
 
 
 class GroupJoinRequestDetail(generics.RetrieveUpdateAPIView):
@@ -139,6 +128,7 @@ class GroupBookmarkDetail(generics.RetrieveDestroyAPIView):
         bookmark_id = self.kwargs.get("bookmark_id")
         queryset = GroupBookmark.objects.filter(id=bookmark_id, group_id=group_id)
         return queryset
+
 
 """
 class GroupApiRoot(generics.GenericAPIView):
