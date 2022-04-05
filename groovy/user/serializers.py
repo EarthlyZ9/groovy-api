@@ -6,7 +6,6 @@ User = get_user_model()
 
 
 class UniversitySerializer(serializers.HyperlinkedModelSerializer):
-
     class Meta:
         model = University
         fields = ["id", "name", "created_at", "updated_at"]
@@ -14,7 +13,6 @@ class UniversitySerializer(serializers.HyperlinkedModelSerializer):
 
 
 class MiniUniversitySerializer(serializers.HyperlinkedModelSerializer):
-
     class Meta:
         model = University
         fields = ["url", "id", "name"]
@@ -24,7 +22,9 @@ class MiniUniversitySerializer(serializers.HyperlinkedModelSerializer):
 class UserSerializer(serializers.HyperlinkedModelSerializer):
 
     university = MiniUniversitySerializer(read_only=True)
-    bookmarks = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='group-bookmark-detail')
+    bookmarks = serializers.HyperlinkedRelatedField(
+        many=True, read_only=True, view_name="group-bookmark-detail"
+    )
 
     class Meta:
         model = User
@@ -54,8 +54,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         read_only_fields = [
             "id",
             "name",
-            "gender"
-            "admission_class",
+            "gender" "admission_class",
             "profile_image_url",
             "thumbnail_image_url",
             "push_id",
@@ -94,4 +93,3 @@ class SimplifiedUserSerializer(serializers.HyperlinkedModelSerializer):
             "profile_image_url",
             "thumbnail_image_url",
         ]
-

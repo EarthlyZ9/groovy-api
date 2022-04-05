@@ -73,7 +73,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
         (FEMALE, "FEMALE"),
     )
 
-    ADMISSION_YEAR = [(r,r) for r in range(2000, datetime.now().year+2)]
+    ADMISSION_YEAR = [(r, r) for r in range(2000, datetime.now().year + 2)]
 
     FRESHMEN = 1
     SOPHOMORE = 2
@@ -86,23 +86,25 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
         (SENIOR, 4),
     )
 
-    OTHER = '기타'
-    DELETE_REASONS = (
-        (OTHER, _('기타')),
-    )
+    OTHER = "기타"
+    DELETE_REASONS = ((OTHER, _("기타")),)
 
     id = models.BigAutoField(primary_key=True)
     email = models.EmailField(max_length=64, unique=True, null=True)
     name = models.CharField(max_length=20, default="", help_text="실명")
-    nickname = models.CharField(max_length=20, blank=True, default="", help_text="서비스 상에서 사용되는 이름")
+    nickname = models.CharField(
+        max_length=20, blank=True, default="", help_text="서비스 상에서 사용되는 이름"
+    )
     gender = models.CharField(max_length=8, choices=GENDER_CHOICES)
     birth_date = models.DateField(null=True)
 
-    university = models.ForeignKey('University', on_delete=models.DO_NOTHING)
+    university = models.ForeignKey("University", on_delete=models.DO_NOTHING, null=True)
     is_university_confirmed = models.BooleanField(default=False)
     university_confirmed_at = models.DateTimeField(null=True)
 
-    admission_class = models.SmallIntegerField(choices=ADMISSION_YEAR, default=datetime.now().year)
+    admission_class = models.SmallIntegerField(
+        choices=ADMISSION_YEAR, default=datetime.now().year
+    )
     grade = models.SmallIntegerField(choices=GRADE_CHOICES)
 
     profile_image_url = models.URLField(max_length=256, blank=True, default="")
@@ -119,7 +121,9 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
     auth_token = models.CharField(null=True, max_length=128)
 
     is_deleted = models.BooleanField(default=False)
-    deleted_reason = models.CharField(choices=DELETE_REASONS, max_length=255, blank=True, null=True)
+    deleted_reason = models.CharField(
+        choices=DELETE_REASONS, max_length=255, blank=True, null=True
+    )
     deleted_at = models.DateTimeField(null=True)
 
     is_staff = models.BooleanField(
@@ -160,10 +164,8 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
 
 class UserSuggestion(TimeStampMixin):
 
-    OTHER = '기타'
-    SUGGESTION_TYPES = (
-        (OTHER, _('기타'))
-    )
+    OTHER = "기타"
+    SUGGESTION_TYPES = (OTHER, _("기타"))
 
     id = models.BigAutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
@@ -171,7 +173,7 @@ class UserSuggestion(TimeStampMixin):
     content = models.TextField()
 
     class Meta:
-        db_table = 'user_suggestion'
+        db_table = "user_suggestion"
 
 
 class University(TimeStampMixin):
@@ -179,7 +181,7 @@ class University(TimeStampMixin):
     name = models.CharField(max_length=50)
 
     class Meta:
-        db_table = 'university'
+        db_table = "university"
 
 
 class UserNotification(TimeStampMixin):
@@ -211,4 +213,4 @@ class UserNotification(TimeStampMixin):
     redirect_url = models.URLField(blank=True, null=True, max_length=30)
 
     class Meta:
-        db_table = 'user_notification'
+        db_table = "user_notification"

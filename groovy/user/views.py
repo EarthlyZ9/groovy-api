@@ -2,7 +2,11 @@ from rest_framework import mixins, generics
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
 from user.models import User, University
-from user.serializers import UserSerializer, UniversitySerializer, MiniUniversitySerializer
+from user.serializers import (
+    UserSerializer,
+    UniversitySerializer,
+    MiniUniversitySerializer,
+)
 
 # Create your views here.
 """
@@ -33,15 +37,4 @@ class UniversityList(generics.ListAPIView):
 class UniversityDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = University.objects.all()
     serializer_class = UniversitySerializer
-
-
-class UserApiRoot(generics.GenericAPIView):
-    name = 'User'
-
-    def get(self, request, *args, **kwargs):
-        return Response({
-            'users': reverse('user-list', request=request),
-            'university': reverse('university-list', request=request),
-            })
-
 
