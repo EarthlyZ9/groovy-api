@@ -7,43 +7,42 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='GroupChat',
+            name="GroupChat",
             fields=[
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('id', models.BigAutoField(primary_key=True, serialize=False)),
-                ('content', models.CharField(max_length=1000)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("id", models.BigAutoField(primary_key=True, serialize=False)),
+                ("content", models.CharField(max_length=1000)),
             ],
             options={
-                'db_table': 'group_chat',
+                "db_table": "group_chat",
             },
         ),
         migrations.CreateModel(
-            name='GroupChatroom',
+            name="GroupChatroom",
             fields=[
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('id', models.BigAutoField(primary_key=True, serialize=False)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("id", models.BigAutoField(primary_key=True, serialize=False)),
             ],
             options={
-                'db_table': 'group_chatroom',
+                "db_table": "group_chatroom",
             },
         ),
         migrations.CreateModel(
-            name='RegularChat',
+            name="RegularChat",
             fields=[
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('id', models.BigAutoField(primary_key=True, serialize=False)),
-                ('content', models.CharField(max_length=1000)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("id", models.BigAutoField(primary_key=True, serialize=False)),
+                ("content", models.CharField(max_length=1000)),
             ],
             options={
-                'db_table': 'regular_chat',
+                "db_table": "regular_chat",
             },
         ),
     ]

@@ -11,34 +11,48 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('chat', '0001_initial'),
-        ('group', '0001_initial'),
+        ("chat", "0001_initial"),
+        ("group", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='regularchat',
-            name='receiver',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='regular_chat_receiver', to=settings.AUTH_USER_MODEL),
+            model_name="regularchat",
+            name="receiver",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="regular_chat_receiver",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='regularchat',
-            name='sender',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='regular_chat_sender', to=settings.AUTH_USER_MODEL),
+            model_name="regularchat",
+            name="sender",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="regular_chat_sender",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='groupchatroom',
-            name='group',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='group.group'),
+            model_name="groupchatroom",
+            name="group",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="group.group"
+            ),
         ),
         migrations.AddField(
-            model_name='groupchat',
-            name='chatroom',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='chat.groupchatroom'),
+            model_name="groupchat",
+            name="chatroom",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="chat.groupchatroom"
+            ),
         ),
         migrations.AddField(
-            model_name='groupchat',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="groupchat",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]

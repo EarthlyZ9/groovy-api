@@ -1,46 +1,26 @@
-from rest_framework import generics
-from chat.models import GroupChatroom, GroupChat, RegularChat
-from chat.serializers import GroupChatroomSerializer, GroupChatSerializer, RegularChatSerializer
-from rest_framework.reverse import reverse
+from rest_framework import generics, permissions, status
 from rest_framework.response import Response
+from chat.services import ChatService
 
 
-class ChatApiRoot(generics.GenericAPIView):
-    name = 'Chat'
+class ChatList(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, *args, **kwargs):
-        return Response({
-            'group_chatroom': reverse('group-chatroom-list', request=request),
-            'group_chat': reverse('group-chat-list', request=request),
-            'regular_chat': reverse('regular-chat-list', request=request),
-            })
+    def list(self, request, *args, **kwargs):
+        user = request.user
+        personal = ChatService.personal_chatroom_list(user)
+        group = ChatService.group_chatroom_list(user)
+        return Response(
+            {"personal": personal, "group": group}, status=status.HTTP_200_OK
+        )
 
-
-class GroupChatroomList(generics.ListCreateAPIView):
-    queryset = GroupChatroom.objects.all()
-    serializer_class = GroupChatroomSerializer
+    # TODO: 채팅방 나가기 기능 더하기
 
 
-class GroupChatroomDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = GroupChatroom.objects.all()
-    serializer_class = GroupChatroomSerializer
+class GroupChatDetail(generics.ListCreateAPIView):
+    # TODO: 채팅 불러오기
+    pass
 
 
-class GroupChatList(generics.ListCreateAPIView):
-    queryset = GroupChat.objects.all().order_by('chatroom_id')
-    serializer_class = GroupChatSerializer
-
-
-class GroupChatDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = GroupChatroom.objects.all()
-    serializer_class = GroupChatSerializer
-
-
-class RegularChatList(generics.ListCreateAPIView):
-    queryset = RegularChat.objects.all().order_by('receiver_id')
-    serializer_class = RegularChatSerializer
-
-
-class RegularChatDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = RegularChat.objects.all()
-    serializer_class = RegularChatSerializer
+class PersonalChatDetail(generics.ListCreateAPIView):
+    pass

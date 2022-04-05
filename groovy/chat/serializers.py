@@ -1,34 +1,38 @@
 from rest_framework import serializers
-from chat.models import GroupChatroom, GroupChat, RegularChat
-from group.serializers import GroupSerializer
+from chat.models import GroupChatroom, GroupChat, PersonalChatroom, PersonalChat
+from group.serializers import GroupSerializer, MiniGroupSerializer
 from user.serializers import SimplifiedUserSerializer
 
 
-class GroupChatroomSerializer(serializers.HyperlinkedModelSerializer):
+class GroupChatroomSerializer(serializers.ModelSerializer):
+    group = MiniGroupSerializer(read_only=True)
+    latest_chat = serializers.SerializerMethodField()
 
     class Meta:
         model = GroupChatroom
         fields = [
-            "url",
             "id",
-            "group_id",
+            "group",
+            "latest_chat",
             "created_at",
             "updated_at",
         ]
         read_only_fields = [
-            "url",
             "id",
-            "group_id",
+            "group",
+            "latest_chat",
             "created_at",
             "updated_at",
         ]
 
-        extra_kwargs = {
-            'url': {'view_name': 'group-chatroom-detail'},
-        }
+    def get_latest_chat(self, obj):
+        instance = (
+            GroupChat.objects.filter(chatroom_id=obj.id).order_by("created_at").first()
+        )
+        return GroupChatSerializer(instance)
 
 
-class GroupChatSerializer(serializers.HyperlinkedModelSerializer):
+class GroupChatSerializer(serializers.ModelSerializer):
     chatroom = GroupChatroomSerializer(read_only=True)
     user = SimplifiedUserSerializer(read_only=True)
 
@@ -51,22 +55,18 @@ class GroupChatSerializer(serializers.HyperlinkedModelSerializer):
             "updated_at",
         ]
 
-        extra_kwargs = {
-            'url': {'view_name': 'group-chat-detail'},
-        }
 
-
-class RegularChatSerializer(serializers.HyperlinkedModelSerializer):
-    sender = SimplifiedUserSerializer(read_only=True)
-    receiver = SimplifiedUserSerializer(read_only=True)
+class PersonalChatroomSerializer(serializers.ModelSerializer):
+    group = MiniGroupSerializer(read_only=True)
+    latest_chat = serializers.SerializerMethodField()
 
     class Meta:
-        model = RegularChat
+        model = PersonalChatroom
         fields = [
             "id",
             "sender",
             "receiver",
-            "content",
+            "latest_chat",
             "created_at",
             "updated_at",
         ]
@@ -74,11 +74,44 @@ class RegularChatSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "sender",
             "receiver",
-            "content",
+            "latest_chat",
             "created_at",
             "updated_at",
         ]
 
-        extra_kwargs = {
-            'url': {'view_name': 'regular-chat-detail'},
-        }
+    def get_latest_chat(self, obj):
+        instance = (
+            PersonalChat.objects.filter(chatroom_id=obj.id)
+            .order_by("created_at")
+            .first()
+        )
+        return PersonalChatroomSerializer(instance)
+
+
+class PersonalChatSerializer(serializers.ModelSerializer):
+    chatroom = PersonalChatroomSerializer(read_only=True)
+    sender = SimplifiedUserSerializer(read_only=True)
+    receiver = SimplifiedUserSerializer(read_only=True)
+
+    class Meta:
+        model = PersonalChat
+        fields = [
+            "id",
+            "chatroom",
+            "sender",
+            "receiver",
+            "content",
+            "is_join_request",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = [
+            "id",
+            "chatroom",
+            "sender",
+            "receiver",
+            "content",
+            "is_join_request",
+            "created_at",
+            "updated_at",
+        ]
