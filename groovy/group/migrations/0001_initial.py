@@ -8,60 +8,77 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Group',
+            name="Group",
             fields=[
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('id', models.BigAutoField(primary_key=True, serialize=False)),
-                ('title', models.CharField(max_length=32)),
-                ('content', models.CharField(max_length=1000)),
-                ('quota', models.PositiveSmallIntegerField(null=True)),
-                ('has_no_quota', models.BooleanField(default=False)),
-                ('is_approval_needed', models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("id", models.BigAutoField(primary_key=True, serialize=False)),
+                ("title", models.CharField(max_length=32)),
+                ("content", models.CharField(max_length=1000)),
+                ("quota", models.PositiveSmallIntegerField(null=True)),
+                ("has_no_quota", models.BooleanField(default=False)),
+                ("is_approval_needed", models.BooleanField(default=True)),
             ],
             options={
-                'db_table': 'group',
+                "db_table": "group",
             },
         ),
         migrations.CreateModel(
-            name='GroupBookmark',
+            name="GroupBookmark",
             fields=[
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('id', models.BigAutoField(primary_key=True, serialize=False)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("id", models.BigAutoField(primary_key=True, serialize=False)),
             ],
             options={
-                'db_table': 'group_bookmark',
+                "db_table": "group_bookmark",
             },
         ),
         migrations.CreateModel(
-            name='GroupJoinRequest',
+            name="GroupJoinRequest",
             fields=[
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('id', models.BigAutoField(primary_key=True, serialize=False)),
-                ('status', models.CharField(choices=[('REFUSED', 'REFUSED'), ('ACCEPTED', 'ACCEPTED'), ('PENDING', 'PENDING')], default='PENDING', max_length=15)),
-                ('status_changed_at', models.DateTimeField(null=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("id", models.BigAutoField(primary_key=True, serialize=False)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("REFUSED", "REFUSED"),
+                            ("ACCEPTED", "ACCEPTED"),
+                            ("PENDING", "PENDING"),
+                        ],
+                        default="PENDING",
+                        max_length=15,
+                    ),
+                ),
+                ("status_changed_at", models.DateTimeField(null=True)),
             ],
             options={
-                'db_table': 'group_join_request',
+                "db_table": "group_join_request",
             },
         ),
         migrations.CreateModel(
-            name='GroupMember',
+            name="GroupMember",
             fields=[
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('id', models.BigAutoField(primary_key=True, serialize=False)),
-                ('group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='members', to='group.group')),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("id", models.BigAutoField(primary_key=True, serialize=False)),
+                (
+                    "group",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="members",
+                        to="group.group",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'group_member',
+                "db_table": "group_member",
             },
         ),
     ]

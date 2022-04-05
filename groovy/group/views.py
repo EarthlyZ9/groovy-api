@@ -1,41 +1,47 @@
 from datetime import datetime
-
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions, filters, status
 from rest_framework.response import Response
-
+from user.services import NotificationService
 from chat.services import ChatService
 from group.models import Group, GroupJoinRequest, GroupMember, GroupBookmark
-from group.permissions import IsManagerOrReadOnly, ManagerOnly, IsBookmarkOwner, IsManagerOrMember
+from group.permissions import (
+    IsManagerOrReadOnly,
+    ManagerOnly,
+    IsBookmarkOwner,
+    IsManagerOrMember,
+)
 from group.serializers import (
     GroupSerializer,
     GroupJoinRequestSerializer,
     GroupMemberSerializer,
-    GroupBookmarkSerializer
+    GroupBookmarkSerializer,
 )
 from group.services import GroupService
-from user.services import NotificationService
 
 
 class GroupList(generics.ListCreateAPIView):
-    queryset = Group.objects.all().order_by('created_at')
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['status']
-    search_fields = ['title', 'content', 'manager']
+    filterset_fields = ["status"]
+    search_fields = ["title", "content", "manager"]
 
     def perform_create(self, serializer):
-        serializer.save(manager=self.request.user)  # when created, add request.user as manager
-    """
+        serializer.save(
+            manager=self.request.user
+        )  # when created, add request.user as manager
+
     def get_queryset(self):
-        queryset = Group.objects
-        user = self.request.user
-        queryset = queryset.filter(manager=user)
+        queryset = Group.objects.all().order_by("created_at")
+        is_mine = self.request.query_params.get("m", "").strip()
+
+        if is_mine:
+            queryset = queryset.filter(manager_id=self.request.user.id)
+
         queryset = self.get_serializer_class().setup_eager_loading(queryset)
         return queryset
-    """
 
 
 class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -43,17 +49,28 @@ class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = GroupSerializer
     permission_classes = [IsManagerOrReadOnly, permissions.IsAuthenticatedOrReadOnly]
 
+    # Retrieve 할 때 bookmark 되어 있는지, 되어 있다면 그 ID 값을 같이 반환해줌 (북마크 표시 위함)
+    def retrieve(self, request, *args, **kwargs):
+        group_id = kwargs.get("pk")
+        group = Group.objects.filter(id=group_id).first()
+        bookmark_id = group.bookmarks.get('id', None)
+        return Response(
+            {'group-info': GroupSerializer(group).data, 'bookmark': bookmark_id}, status=status.HTTP_201_CREATED
+        )
+
 
 class CreateGroupJoinRequest(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
-        group_id = kwargs.get('pk')
+        group_id = kwargs.get("pk")
         group = get_object_or_404(Group, pk=group_id)
 
         GroupService.create_join_request(request.user, group)
         ChatService.join_request_chat(request.user, group)
         NotificationService.notify_join_request(request.user, group)
 
-        return Response(GroupJoinRequestSerializer(group).data, status=status.HTTP_201_CREATED)
+        return Response(
+            GroupJoinRequestSerializer(group).data, status=status.HTTP_201_CREATED
+        )
 
 
 class GroupJoinRequestDetail(generics.RetrieveUpdateAPIView):
@@ -71,32 +88,39 @@ class GroupJoinRequestDetail(generics.RetrieveUpdateAPIView):
         queryset = GroupJoinRequest.objects.filter(manager=user, request_id=request_id)
         return queryset
 
-    # TODO: Override update method to send notification when accepted/refused
-    """
-    def update(self, request, *args, **kwargs):
-        group_id = kwargs.get('pk')
+    def put(self, request, *args, **kwargs):
+        # 수락 시 requestor 에게 알림 보내고, member 에 추가
+        group_id = kwargs.get("pk")
         group = get_object_or_404(Group, pk=group_id)
-        status = kwargs.pop('status', False)
+        requestor = kwargs.get("requestor")
 
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
-    """
+        changed_status = kwargs.get("status")
+        if changed_status == GroupJoinRequest.ACCEPTED:
+            GroupService.add_group_member(group, requestor)
+            NotificationService.notify_join_request_result(
+                requestor, group, changed_status
+            )
+
+        # 거절 시 requestor 에게 알림 보내기
+        elif changed_status == GroupJoinRequest.REFUSED:
+            NotificationService.notify_join_request_result(
+                requestor, group, changed_status
+            )
+
+        return self.update(request, *args, **kwargs)
 
     def perform_update(self, serializer):
         serializer.save(status_changed_at=datetime.now())
 
 
 class GroupMemberList(generics.ListCreateAPIView):
-    queryset = GroupMember.objects.all().order_by('member')
+    queryset = GroupMember.objects.all().order_by("member")
     serializer_class = GroupMemberSerializer
     permission_classes = [IsManagerOrReadOnly, permissions.IsAuthenticated]
 
     def get_queryset(self):
         group_id = self.kwargs.get("pk")
-        queryset = GroupMember.objects.filter(group_id=group_id).order_by('member')
+        queryset = GroupMember.objects.filter(group_id=group_id).order_by("member")
         return queryset
 
     def perform_create(self, serializer):
@@ -105,43 +129,31 @@ class GroupMemberList(generics.ListCreateAPIView):
 
 
 class GroupMemberDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = GroupMember.objects.all()
     serializer_class = GroupMemberSerializer
     permission_classes = [permissions.IsAuthenticated, IsManagerOrMember]
 
     def get_queryset(self):
-        group_id = self.kwargs.get('pk')
+        group_id = self.kwargs.get("pk")
         member_id = self.kwargs.get("member_id")
         queryset = GroupMember.objects.filter(id=member_id, group_id=group_id)
         return queryset
 
-    def perform_update(self, serializer):
-        serializer.save(status_changed_at=datetime.now())
+
+class CreateGroupBookmark(generics.CreateAPIView):
+    def create(self, request, *args, **kwargs):
+        group_id = kwargs.get("pk")
+        bookmark = GroupService.create_bookmark(request.user, group_id)
+        return Response(
+            GroupBookmarkSerializer(bookmark).data, status=status.HTTP_201_CREATED
+        )
 
 
-class GroupBookmarkList(generics.ListCreateAPIView):
-    queryset = GroupBookmark.objects.all()
-    serializer_class = GroupBookmarkSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        group_id = self.kwargs.get("pk")
-        queryset = GroupMember.objects.filter(group_id=group_id).order_by('member')
-        return queryset
-
-    def perform_create(self, serializer):
-        group_id = self.kwargs.get("pk")
-        serializer.save(user=self.request.user, group_id=group_id)
-
-
-class GroupBookmarkDetail(generics.RetrieveDestroyAPIView):
-    queryset = GroupBookmark.objects.all()
-    serializer_class = GroupBookmarkSerializer
+class DestroyGroupBookmark(generics.DestroyAPIView):
     permission_classes = [IsBookmarkOwner]
 
-    def get_queryset(self):
+    def destroy(self, request, *args, **kwargs):
         group_id = self.kwargs.get("pk")
         bookmark_id = self.kwargs.get("bookmark_id")
-        queryset = GroupBookmark.objects.filter(id=bookmark_id, group_id=group_id)
-        return queryset
-
+        instance = GroupBookmark.objects.filter(id=bookmark_id, group_id=group_id)
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)

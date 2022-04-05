@@ -163,9 +163,9 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.BasicAuthentication",
     ),
-    #"DEFAULT_RENDERER_CLASSES": [
-       # 'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
-    #],
+    # "DEFAULT_RENDERER_CLASSES": [
+    # 'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
+    # ],
     "DEFAULT_PARSER_CLASSES": [
         "rest_framework.parsers.JSONParser",
         "rest_framework.parsers.FormParser",
@@ -174,8 +174,7 @@ REST_FRAMEWORK = {
     "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.URLPathVersioning",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
-    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
-
+    "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
 }
 
 
