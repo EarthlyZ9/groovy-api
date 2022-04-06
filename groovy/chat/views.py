@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from chat.services import ChatService
 
 
-class ChatList(generics.ListAPIView):
+class ChatRoomList(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
