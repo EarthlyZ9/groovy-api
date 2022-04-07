@@ -34,3 +34,14 @@ class NotificationService:
                 content=content,
                 redirect_url=f"group/{group.id}/",
             )
+
+    @staticmethod
+    def notify_friend_request(request_from, request_to):
+        notification_type = UserNotification.FRIEND_REQUEST_RECEIVED
+        content = f"'{request_from}'(이)가 친구 요청을 했어요!"
+        return UserNotification.objects.create(
+            user=request_to,
+            notificaton_type=notification_type,
+            content=content,
+            redirect_url="chat/",
+        )

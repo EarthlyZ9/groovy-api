@@ -1,16 +1,15 @@
 from rest_framework import serializers
-from user.serializers import SimplifiedUserSerializer
+
 from friend.models import Friend, FriendRequest
+from user.serializers import SimplifiedUserSerializer
 
 
-class FriendSerializer(serializers.HyperlinkedModelSerializer):
-    user = SimplifiedUserSerializer(read_only=True)
-    friend = SimplifiedUserSerializer(read_only=True)
+class FriendSerializer(serializers.ModelSerializer):
+    friend = SimplifiedUserSerializer(read_only=True, many=True)
 
     class Meta:
         model = Friend
         fields = [
-            "url",
             "id",
             "user",
             "friend",
@@ -18,7 +17,6 @@ class FriendSerializer(serializers.HyperlinkedModelSerializer):
             "updated_at",
         ]
         read_only_fields = [
-            "url",
             "id",
             "user_id",
             "friend_id",
@@ -27,14 +25,13 @@ class FriendSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
 
-class FriendRequestSerializer(serializers.HyperlinkedModelSerializer):
+class FriendRequestSerializer(serializers.ModelSerializer):
     request_from = SimplifiedUserSerializer(read_only=True)
     request_to = SimplifiedUserSerializer(read_only=True)
 
     class Meta:
         model = FriendRequest
         fields = [
-            "url",
             "id",
             "request_from",
             "request_to",
@@ -44,15 +41,9 @@ class FriendRequestSerializer(serializers.HyperlinkedModelSerializer):
             "updated_at",
         ]
         read_only_fields = [
-            "url",
             "id",
             "request_from",
             "request_to",
             "created_at",
             "updated_at",
         ]
-
-        extra_kwargs = {
-            'url': {'view_name': 'friend-request-detail'},
-        }
-

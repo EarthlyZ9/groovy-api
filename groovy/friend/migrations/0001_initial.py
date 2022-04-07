@@ -7,32 +7,41 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Friend',
+            name="Friend",
             fields=[
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('id', models.BigAutoField(primary_key=True, serialize=False)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("id", models.BigAutoField(primary_key=True, serialize=False)),
             ],
             options={
-                'db_table': 'friend',
+                "db_table": "friend",
             },
         ),
         migrations.CreateModel(
-            name='FriendRequest',
+            name="FriendRequest",
             fields=[
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('id', models.BigAutoField(primary_key=True, serialize=False)),
-                ('status', models.CharField(choices=[('REFUSED', 'REFUSED'), ('ACCEPTED', 'ACCEPTED'), ('PENDING', 'PENDING')], max_length=15)),
-                ('status_changed_at', models.DateTimeField()),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("id", models.BigAutoField(primary_key=True, serialize=False)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("REFUSED", "REFUSED"),
+                            ("ACCEPTED", "ACCEPTED"),
+                            ("PENDING", "PENDING"),
+                        ],
+                        max_length=15,
+                    ),
+                ),
+                ("status_changed_at", models.DateTimeField()),
             ],
             options={
-                'db_table': 'friend_request',
+                "db_table": "friend_request",
             },
         ),
     ]
