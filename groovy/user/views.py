@@ -1,19 +1,10 @@
-from rest_framework import mixins, generics
-from rest_framework.reverse import reverse
-from rest_framework.response import Response
+from rest_framework import generics
 from user.models import User, University
 from user.serializers import (
     UserSerializer,
     UniversitySerializer,
     MiniUniversitySerializer,
 )
-
-# Create your views here.
-"""
-Two ways to wrap API views
-1) @api_view decorator
-2) APIView class
-"""
 
 
 class UserList(generics.ListCreateAPIView):
