@@ -1,9 +1,10 @@
 from datetime import datetime
+
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions, filters, status
 from rest_framework.response import Response
-from user.services import NotificationService
+
 from chat.services import ChatService
 from group.models import Group, GroupJoinRequest, GroupMember, GroupBookmark
 from group.permissions import (
@@ -19,6 +20,7 @@ from group.serializers import (
     GroupBookmarkSerializer,
 )
 from group.services import GroupService
+from user.services import NotificationService
 
 
 class GroupList(generics.ListCreateAPIView):
@@ -64,12 +66,12 @@ class CreateGroupJoinRequest(generics.CreateAPIView):
         group_id = kwargs.get("pk")
         group = get_object_or_404(Group, pk=group_id)
 
-        GroupService.create_join_request(request.user, group)
+        join_request = GroupService.create_join_request(request.user, group)
         ChatService.join_request_chat(request.user, group)
         NotificationService.notify_join_request(request.user, group)
 
         return Response(
-            GroupJoinRequestSerializer(group).data, status=status.HTTP_201_CREATED
+            GroupJoinRequestSerializer(join_request).data, status=status.HTTP_201_CREATED
         )
 
 
