@@ -59,7 +59,9 @@ class SendFriendRequest(generics.CreateAPIView):
             return Response(data=FriendRequestSerializer(friend_request).data)
 
 
-class UpdateFriendRequest(generics.UpdateAPIView):
+class FriendRequestDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = FriendRequest.objects.all()
+    serializer_class = FriendRequestSerializer
 
     def update(self, request, *args, **kwargs):
         changed_status = kwargs.get("status")
