@@ -45,3 +45,14 @@ class NotificationService:
             content=content,
             redirect_url="chat/",
         )
+
+    @staticmethod
+    def notify_friend_request_accepted(request_from, request_to):
+        notification_type = UserNotification.FRIEND_REQUEST_ACCEPTED
+        content = f"'{request_from}'(와)과 친구가 되었어요!"
+        return UserNotification.objects.create(
+            user=request_to,
+            notification_type=notification_type,
+            cotent=content,
+            redirect_url="friend/",
+        )
