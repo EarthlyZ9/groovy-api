@@ -74,21 +74,16 @@ class GroupJoinRequestList(generics.ListCreateAPIView):
         )
 
 
-class UpdateGroupJoinRequest(generics.UpdateAPIView):
+class GroupJoinRequestDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = GroupJoinRequestSerializer
     permission_classes = [ManagerOnly]
+    queryset = GroupJoinRequest.objects.all()
 
-    def get_queryset(self):
-        user = self.request.user
-        request_id = self.kwargs.get("request_id")
-        queryset = GroupJoinRequest.objects.filter(manager=user, request_id=request_id)
-        return queryset
-
-    def update(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         join_request_obj = self.get_object()
         group = join_request_obj.group
         requestor = join_request_obj.requestor
-        changed_status = kwargs.get("status")
+        changed_status = request.data.get("status")
 
         updated_join_request_obj = GroupService.update_join_request_status(join_request_obj, changed_status)
 
@@ -103,7 +98,7 @@ class UpdateGroupJoinRequest(generics.UpdateAPIView):
 
 
 class GroupMemberList(generics.ListCreateAPIView):
-    queryset = GroupMember.objects.all().order_by("member")
+    queryset = GroupMember.objects.all()
     serializer_class = GroupMemberSerializer
     permission_classes = [IsManagerOrReadOnly, permissions.IsAuthenticated]
 
@@ -115,7 +110,7 @@ class GroupMemberList(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         group_id = kwargs.get("pk")
         group = get_object_or_404(Group, pk=group_id)
-        new_member = kwargs.get("member")
+        new_member = request.data("member")
         group_member = GroupService.add_group_member(group, new_member)
         return Response(data=GroupMemberSerializer(group_member).data)
 

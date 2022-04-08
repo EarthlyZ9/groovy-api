@@ -4,7 +4,7 @@ from .views import (
     GroupList,
     GroupDetail,
     GroupJoinRequestList,
-    UpdateGroupJoinRequest,
+    GroupJoinRequestDetail,
     GroupMemberList,
     GroupBookmarkList,
     GroupBookmarkDetail,
@@ -23,7 +23,7 @@ urlpatterns = [
     ),
     path(
         "join-requests/<int:pk>/",
-        UpdateGroupJoinRequest.as_view(),
+        GroupJoinRequestDetail.as_view(),
         name="join-request-detail",
     ),
     path(

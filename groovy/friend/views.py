@@ -63,8 +63,8 @@ class FriendRequestDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = FriendRequest.objects.all()
     serializer_class = FriendRequestSerializer
 
-    def update(self, request, *args, **kwargs):
-        changed_status = kwargs.get("status")
+    def put(self, request, *args, **kwargs):
+        changed_status = request.data.get("status")
         friend_request_obj = self.get_object()
         request_from = friend_request_obj.request_from
         request_to = friend_request_obj.request_to
