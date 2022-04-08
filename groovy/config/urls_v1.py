@@ -1,13 +1,9 @@
 """root url configurations and routers for version 1"""
 from django.contrib import admin
-from django.http import HttpResponse
 from django.urls import path, re_path, include
-from rest_framework import permissions
-from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-from rest_framework.decorators import api_view
-from rest_framework.reverse import reverse
-from rest_framework.response import Response
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions
 
 # API docs
 api_info = openapi.Info(
@@ -15,7 +11,7 @@ api_info = openapi.Info(
     default_version="v1",
     description="CODOT - Groovy Application을 위한 API 문서",
     terms_of_service="https://www.google.com/policies/terms/",
-    contact=openapi.Contact(email="nsong.lim@gmail.com"),
+    contact=openapi.Contact(email="unsung.lim@gmail.com"),
     license=openapi.License(name="BSD License"),
 )
 SchemaView = get_schema_view(
@@ -35,10 +31,10 @@ admin.site.empty_value_display = "비어있음"
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
-    path("group/", include("group.urls")),
-    path("user/", include("user.urls")),
-    path("chat/", include("chat.urls")),
-    path("friend/", include("friend.urls")),
+    path("groups/", include("group.urls")),
+    path("users/", include("user.urls")),
+    path("chats/", include("chat.urls")),
+    path("friends/", include("friend.urls")),
 ]
 
 urlpatterns += [
