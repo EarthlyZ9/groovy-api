@@ -1,13 +1,13 @@
 from django.urls import path
+
 from .views import (
     GroupList,
     GroupDetail,
-    CreateGroupJoinRequest,
-    GroupJoinRequestDetail,
+    GroupJoinRequestList,
+    UpdateGroupJoinRequest,
     GroupMemberList,
-    GroupMemberDetail,
-    CreateGroupBookmark,
-    DestroyGroupBookmark,
+    GroupBookmarkList,
+    GroupBookmarkDetail,
 )
 
 urlpatterns = [
@@ -17,28 +17,23 @@ urlpatterns = [
         "<int:pk>/group-members/", GroupMemberList.as_view(), name="group-member-list"
     ),
     path(
-        "<int:pk>/group-members/<int:member_id>",
-        GroupMemberDetail.as_view(),
-        name="group-member-detail",
-    ),
-    path(
         "<int:pk>/join-requests/",
-        CreateGroupJoinRequest.as_view(),
+        GroupJoinRequestList.as_view(),
         name="join-request-list",
     ),
     path(
-        "<int:pk>/join-requests/<int:request_id>/",
-        GroupJoinRequestDetail.as_view(),
+        "join-requests/<int:pk>/",
+        UpdateGroupJoinRequest.as_view(),
         name="join-request-detail",
     ),
     path(
         "<int:pk>/bookmarks/",
-        CreateGroupBookmark.as_view(),
-        name="create-group-bookmark",
+        GroupBookmarkList.as_view(),
+        name="group-bookmark-list",
     ),
     path(
-        "<int:pk>/bookmarks/<int:bookmark_id>/",
-        DestroyGroupBookmark.as_view(),
+        "bookmarks/<int:pk>/",
+        GroupBookmarkDetail.as_view(),
         name="group-bookmark-detail",
     ),
 ]

@@ -1,17 +1,17 @@
-from django.db.models import Count
 from rest_framework import serializers
+
 from group.models import Group, GroupJoinRequest, GroupMember, GroupBookmark
 from user.serializers import SimplifiedUserSerializer
 
 
 class GroupSerializer(serializers.ModelSerializer):
     manager = SimplifiedUserSerializer(read_only=True)
-    members = serializers.HyperlinkedRelatedField(
-        many=True, read_only=True, view_name="group-member-detail"
+    members = serializers.RelatedField(
+        many=True, read_only=True
     )
     members_count = serializers.IntegerField(source="members.count", read_only=True)
-    bookmarks = serializers.HyperlinkedRelatedField(
-        many=True, read_only=True, view_name="group-bookmark-detail"
+    bookmarks = serializers.RelatedField(
+        many=True, read_only=True
     )
     bookmarks_count = serializers.IntegerField(source="bookmarks.count", read_only=True)
 
@@ -42,21 +42,6 @@ class GroupSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-
-    @staticmethod
-    def setup_eager_loading(queryset):
-        """Perform necessary eager loading of data."""
-        # select_related for "to-one" relationships
-        # queryset = queryset.select_related("author", "category")
-
-        # prefetch_related for "to-many" relationships
-        queryset = queryset.prefetch_related("join_requests, bookmarks, members")
-
-        # Prefetch for subsets of relationships
-        queryset = queryset.annotate(
-            Count("members", distinct=True).annotate(Count("bookmarks", distinct=True))
-        )
-        return queryset
 
 
 class MiniGroupSerializer(serializers.ModelSerializer):
@@ -143,5 +128,5 @@ class GroupBookmarkSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GroupBookmark
-        fields = ["url", "id", "group", "user", "created_at", "updated_at"]
-        read_only_fields = ["url", "id", "group", "user", "created_at", "updated_at"]
+        fields = ["id", "group", "user", "created_at", "updated_at"]
+        read_only_fields = ["id", "group", "user", "created_at", "updated_at"]
