@@ -18,8 +18,8 @@ class FriendSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             "id",
-            "user_id",
-            "friend_id",
+            "user",
+            "friend",
             "created_at",
             "updated_at",
         ]
@@ -44,6 +44,7 @@ class FriendRequestSerializer(serializers.ModelSerializer):
             "id",
             "request_from",
             "request_to",
+            "status_changed_at",
             "created_at",
             "updated_at",
         ]

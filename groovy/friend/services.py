@@ -1,8 +1,13 @@
-from friend.models import FriendRequest
-from friend.serializers import FriendRequestSerializer
+from datetime import datetime
+
+from friend.models import FriendRequest, Friend
 
 
 class FriendService:
+
+    @staticmethod
+    def get_all_friends(queryset, user):
+        return queryset.filter(friend_user=user).all().order_by('nickname')
 
     @staticmethod
     def send_friend_request(request_from, request_to):
@@ -10,24 +15,24 @@ class FriendService:
         return friend_request, created
 
     @staticmethod
-    def get_latest_friend_request(user):
-        latest_request = FriendRequest.objects.filter(request_to=user).order_by('created_at').first()
-        serializer = FriendRequestSerializer(latest_request)
-        return serializer.data
+    def get_all_friend_request(user):
+        return FriendRequest.objects.filter(request_to=user).all().order_by('created_at')
 
     @staticmethod
-    def change_friend_request_status():
-        # 수락 or 거절, 수락 시 friend model 에 추가 + 알림 보내기
-        pass
+    def update_friend_request_status(obj, changed_status):
+        obj.status = changed_status
+        obj.status_changed_at = datetime.now()
+        return obj
 
     @staticmethod
-    def count_friend_request(user):
-        return FriendRequest.objects.filter(request_to=user).count()
+    def add_friend(request_from, request_to):
+        Friend.objects.create(user=request_from, friend=request_to)
+        Friend.objects.create(user=request_to, friend=request_from)
+        return None
 
     @staticmethod
-    def cancel_friend_request():
-        pass
-
-    @staticmethod
-    def is_friend():
-        pass
+    def delete_friend(obj):
+        user = obj.user
+        friend = obj.friend
+        obj.delete()
+        Friend.objects.filter(user=friend, friend=user).first().delete()

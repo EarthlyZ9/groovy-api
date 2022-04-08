@@ -1,7 +1,6 @@
-from django.http import JsonResponse
-from rest_framework import generics, status, filters
-from rest_framework.response import Response
+from rest_framework import generics, status
 
+from config.Response import Response
 from friend.models import Friend, FriendRequest
 from friend.serializers import FriendSerializer, FriendRequestSerializer
 from friend.services import FriendService
@@ -10,20 +9,16 @@ from user.serializers import SimplifiedUserSerializer
 from user.services import NotificationService
 
 
-class FriendList(generics.ListAPIView):
+class FriendList(generics.GenericAPIView):
     queryset = User.objects.all()
     serializer_class = SimplifiedUserSerializer
 
-    def list(self, request, *args, **kwargs):
-        user = self.request.user
+    def get(self, request):
+        user = request.user
         queryset = self.get_queryset()
-        friends = self.serializer_class(queryset.filter(friend_user=user).all(), many=True).data
-        friend_request_count = FriendService.count_friend_request(user)
-        latest_request = FriendService.get_latest_friend_request(user)
-        return JsonResponse({'friends': friends,
-                             'latest_request': latest_request,
-                             'friend_request_count': friend_request_count},
-                            safe=False, status=status.HTTP_200_OK)
+        friends = FriendService.get_all_friends(queryset, user)
+        friends_data = self.serializer_class(friends, many=True).data
+        return Response(data=friends_data)
 
 
 class FriendDetail(generics.RetrieveDestroyAPIView):
@@ -33,7 +28,12 @@ class FriendDetail(generics.RetrieveDestroyAPIView):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-        return Response(serializer.data['friend'])
+        return Response(data=serializer.data['friend'])
+
+    def destroy(self, request, *args, **kwargs):
+        obj = self.get_object()
+        FriendService.delete_friend(obj)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class FriendRequestList(generics.ListAPIView):
@@ -42,19 +42,7 @@ class FriendRequestList(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return FriendRequest.objects.filter(request_to=user).all()
-
-
-class FriendRequestDetail(generics.UpdateAPIView):
-    queryset = FriendRequest.objects.all()
-    serializer_class = FriendRequestSerializer
-
-
-class UserSearch(generics.ListAPIView):
-    queryset = User.objects.all()
-    serializer_class = SimplifiedUserSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ["nickname"]
+        return FriendService.get_all_friend_request(user=user)
 
 
 class SendFriendRequest(generics.CreateAPIView):
@@ -68,4 +56,24 @@ class SendFriendRequest(generics.CreateAPIView):
         NotificationService.notify_friend_request(request_from, request_to)
 
         if sent:
-            return Response(FriendRequestSerializer(friend_request).data, status=status.HTTP_201_CREATED)
+            return Response(data=FriendRequestSerializer(friend_request).data)
+
+
+class UpdateFriendRequest(generics.UpdateAPIView):
+
+    def update(self, request, *args, **kwargs):
+        changed_status = kwargs.get("status")
+        friend_request_obj = self.get_object()
+        request_from = friend_request_obj.request_from
+        request_to = friend_request_obj.request_to
+
+        updated_friend_request_obj = FriendService.update_friend_request_status(friend_request_obj, changed_status)
+
+        if changed_status == FriendRequest.ACCEPTED:
+            FriendService.add_friend(request_from=request_from, request_to=request_to, )
+            NotificationService.notify_friend_request_accepted(
+                request_from=request_from,
+                request_to=request_to,
+            )
+
+        return Response(data=FriendRequestSerializer(updated_friend_request_obj).data)
