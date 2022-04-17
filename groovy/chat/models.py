@@ -1,17 +1,18 @@
 from django.db import models
-from user.models import User, TimeStampMixin
+
 from group.models import Group
+from user.models import User, TimeStampMixin
 
 
 class GroupChatroom(TimeStampMixin):
     id = models.BigAutoField(primary_key=True)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="group_chatroom")
 
     class Meta:
         db_table = "group_chatroom"
 
     def __repr__(self):
-        return f"GroupChatroom({self.id}, {self.group_id})"
+        return f"GroupChatroom({self.id}, {self.group})"
 
 
 class GroupChat(TimeStampMixin):
@@ -75,3 +76,17 @@ class PersonalChat(TimeStampMixin):
 
     def __repr__(self):
         return f"PersonalChat(id={self.id}, sender={self.sender}, receiver={self.receiver})"
+
+
+class GroupChatroomNotice(TimeStampMixin):
+    id = models.BigAutoField(primary_key=True)
+    chatroom = models.ForeignKey(GroupChatroom, on_delete=models.CASCADE, related_name="notice")
+    pinned_chat = models.ForeignKey(GroupChat, on_delete=models.SET_NULL, null=True, blank=True,
+                                    related_name="pinned_chat")
+
+
+class PersonalChatroomNotice(TimeStampMixin):
+    id = models.BigAutoField(primary_key=True)
+    chatroom = models.ForeignKey(PersonalChatroom, on_delete=models.CASCADE, related_name="notice")
+    pinned_chat = models.ForeignKey(PersonalChat, on_delete=models.SET_NULL, null=True, blank=True,
+                                    related_name="pinned_chat")

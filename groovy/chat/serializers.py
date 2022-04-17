@@ -1,6 +1,8 @@
 from rest_framework import serializers
-from chat.models import GroupChatroom, GroupChat, PersonalChatroom, PersonalChat
-from group.serializers import GroupSerializer, MiniGroupSerializer
+
+from chat.models import GroupChatroom, GroupChat, PersonalChatroom, PersonalChat, GroupChatroomNotice, \
+    PersonalChatroomNotice
+from group.serializers import MiniGroupSerializer
 from user.serializers import SimplifiedUserSerializer
 
 
@@ -29,7 +31,7 @@ class GroupChatroomSerializer(serializers.ModelSerializer):
         instance = (
             GroupChat.objects.filter(chatroom_id=obj.id).order_by("created_at").first()
         )
-        return GroupChatSerializer(instance)
+        return GroupChatSerializer(instance).data
 
 
 class GroupChatSerializer(serializers.ModelSerializer):
@@ -85,7 +87,7 @@ class PersonalChatroomSerializer(serializers.ModelSerializer):
             .order_by("created_at")
             .first()
         )
-        return PersonalChatroomSerializer(instance)
+        return PersonalChatroomSerializer(instance).data
 
 
 class PersonalChatSerializer(serializers.ModelSerializer):
@@ -114,4 +116,36 @@ class PersonalChatSerializer(serializers.ModelSerializer):
             "is_join_request",
             "created_at",
             "updated_at",
+        ]
+
+
+class GroupChatroomNoticeSerializer(serializers.ModelSerializer):
+    pinned_chat = GroupChatSerializer(read_only=True)
+
+    class Meta:
+        model = GroupChatroomNotice
+        fields = [
+            "id",
+            "chatroom",
+            "pinned_chat",
+        ]
+        read_only_fields = [
+            "id",
+            "chatroom",
+        ]
+
+
+class PersonalChatroomNoticeSerializer(serializers.ModelSerializer):
+    pinned_chat = PersonalChatSerializer(read_only=True)
+
+    class Meta:
+        model = PersonalChatroomNotice
+        fields = [
+            "id",
+            "chatroom",
+            "pinned_chat",
+        ]
+        read_only_fields = [
+            "id",
+            "chatroom",
         ]

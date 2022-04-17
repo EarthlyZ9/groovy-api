@@ -1,7 +1,8 @@
 from django.db.models import Q
-from group.models import GroupMember, Group
-from chat.models import PersonalChat, PersonalChatroom, GroupChatroom
-from chat.serializers import PersonalChatroomSerializer, GroupChatroomSerializer
+
+from chat.models import PersonalChat, PersonalChatroom, GroupChatroom, GroupChat
+from chat.serializers import PersonalChatroomSerializer
+from group.models import Group
 
 
 class ChatService:
@@ -16,22 +17,30 @@ class ChatService:
         )
 
     @staticmethod
-    def group_chatroom_list(user):
-        # TODO: 내가 속해있는 그룹 채팅방 로드
-        my_group = GroupMember.objects.filter(member=user).all()
-        group_queryset = Group.objects
-        for group in my_group.iterator():
-            group_queryset |= Group.objects.filter(id=group.group_id).first()
-
-        group_chat_queryset = GroupChatroom.objects
-        for group in group_queryset.iterator():
-            group_chat_queryset |= group.groupchatroom_set.all()
-        group = GroupChatroomSerializer(group_chat_queryset)
-        return group
+    def get_group_chatroom_queryset(user):
+        group_queryset = Group.objects.filter(members=user)
+        group_chatroom_queryset = GroupChatroom.objects.none()
+        for instance in group_queryset:
+            group_chatroom_queryset |= instance.group_chatroom
+        group_chatroom_queryset = group_chatroom_queryset.order_by('updated_at')
+        return group_chatroom_queryset
 
     @staticmethod
-    def personal_chatroom_list(user):
+    def get_personal_chatroom_queryset(user):
         personal_chat_queryset = PersonalChatroom.objects.filter(
             Q(sender=user) | Q(receiver=user)
         )
         return PersonalChatroomSerializer(personal_chat_queryset)
+
+    @staticmethod
+    def get_all_group_chats(chatroom_id):
+        return GroupChat.objects.filter(id=chatroom_id).order_by('-created_at')
+
+    @staticmethod
+    def get_all_personal_chats(chatroom_id):
+        return PersonalChat.objects.filter(id=chatroom_id).order_by('-created_at')
+
+    @staticmethod
+    def delete_notice(obj):
+        obj.pinned_chat = None
+        return obj
