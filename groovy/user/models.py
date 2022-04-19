@@ -92,6 +92,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
 
     id = models.BigAutoField(primary_key=True)
     email = models.EmailField(max_length=64, unique=True, null=True)
+    is_university_email = models.BooleanField(default=True)
     nickname = models.CharField(
         max_length=20, blank=True, default="", help_text="서비스 상에서 사용되는 이름"
     )
@@ -179,8 +180,14 @@ class UserSuggestion(TimeStampMixin):
 
 
 class University(TimeStampMixin):
+    YONSEI = "YONSEI"
+
+    UNIV_CHOICE = (
+        (YONSEI, "YONSEI"),
+    )
+
     id = models.BigAutoField(primary_key=True)
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, choices=UNIV_CHOICE, default=YONSEI)
 
     class Meta:
         db_table = "university"

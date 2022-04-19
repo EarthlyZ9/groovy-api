@@ -13,6 +13,7 @@ urlpatterns = [
         name="check-email",
     ),
     path("verify-email/", auth_views.EmailVerification.as_view(), name="verify-email"),
+    path('verify-email/<str:uid64>/', auth_views.VerifyEmail.as_view(), name="activate"),
     path(
         "password-change/",
         auth_views.PasswordChangeView.as_view(),

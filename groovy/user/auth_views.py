@@ -1,6 +1,12 @@
+from datetime import datetime
+
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
+from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from rest_framework import (
     permissions,
     serializers,
@@ -27,11 +33,7 @@ class BasicSignUpView(APIView):
         email = request.data.get("email")
         password = request.data.get("password")
         nickname = request.data.get("nickname")
-        gender = request.data.get("gender")
-        birth_date = request.data.get("birth_date")
-        university = request.data.get("university")
-        admission_class = request.data.get("admission_class")
-        grade = request.data.get("grade")
+        is_university_email = request.data.get("is_university_email")
 
         if not all((email, password)):
             raise exceptions.ParseError("invalid input form given")
@@ -39,15 +41,20 @@ class BasicSignUpView(APIView):
         if User.objects.filter(email=email).exists():
             return Response(data="이미 가입된 이메일입니다.", status=status.HTTP_409_CONFLICT)
 
+        is_university_confirmed = False
+        university_confirmed_at = None
+
+        if is_university_email:
+            is_university_confirmed = True
+            university_confirmed_at = datetime.now()
+
         user = User.objects.create_user(
             email=email,
             password=password,
             nickname=nickname,
-            gender=gender,
-            birth_date=birth_date,
-            university=university,
-            admission_class=admission_class,
-            grade=grade,
+            is_univerisity_email=is_university_email,
+            is_university_confirmed=is_university_confirmed,
+            university_confirmed_at=university_confirmed_at,
         )
 
         token = get_tokens_for_user(user)  # {refresh, access}
@@ -60,9 +67,20 @@ class EmailVerification(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request, *args, **kwargs):
-        email = request.data.get("email")
-        # TODO: email verification - sending email
-        pass
+        user_email = request.data.get("email")
+        subject = '[Groovy] 회원가입 인증 메일입니다.'
+        message = {'uid': urlsafe_base64_encode(force_bytes(user_email))}
+        send_mail(subject=subject, message=message, from_email=settings.EMAIL_HOST_USER, recipient_list=[user_email])
+
+        return Response(data=dict(email=user_email, message=message))
+
+
+class VerifyEmail(APIView):
+
+    def post(self, request, *args, **kwargs):
+        uid64 = request.data.get("uid64")
+        email = force_str(urlsafe_base64_decode(uid64))
+        return Response(data=email)
 
 
 class BasicSignInView(TokenObtainPairView):
