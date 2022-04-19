@@ -1,5 +1,8 @@
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken
+
 from group.models import GroupJoinRequest
-from user.models import UserNotification
+from user.models import UserNotification, UniversityManualVerification
 
 
 class NotificationService:
@@ -56,3 +59,46 @@ class NotificationService:
             cotent=content,
             redirect_url="friend/",
         )
+
+
+class UserService:
+    @staticmethod
+    def delete_user(user):
+        """
+        perform soft delete
+        """
+        pass
+
+    @staticmethod
+    def agree_service_term(user, is_service_terms_agreed):
+        if is_service_terms_agreed:
+            user.is_service_terms_agreed = is_service_terms_agreed
+
+        user.save(update_fields=["is_service_terms_agreed"])
+        return user
+
+    @staticmethod
+    def reason_for_leave(user, reason):
+        user.deleted_reason = reason
+        user.save(update_fields=["deleted_reason"])
+
+        return user
+
+    @staticmethod
+    def get_university_verification_request(user):
+        university_verification_request = UniversityManualVerification.objects.filter(user=user).first()
+
+        return university_verification_request
+
+
+def _get_refresh_token_for_user(user):
+    return RefreshToken.for_user(user)
+
+
+def get_tokens_for_user(user):
+    refresh = _get_refresh_token_for_user(user)
+
+    return {
+        "refresh": str(refresh),
+        "access": str(refresh.access_token),
+    }

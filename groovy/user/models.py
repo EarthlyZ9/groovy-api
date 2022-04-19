@@ -1,9 +1,10 @@
 import logging
 from datetime import datetime
-from django.db import models
-from django.core.mail import send_mail
+
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
+from django.core.mail import send_mail
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
@@ -91,7 +92,6 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
 
     id = models.BigAutoField(primary_key=True)
     email = models.EmailField(max_length=64, unique=True, null=True)
-    name = models.CharField(max_length=20, default="", help_text="실명")
     nickname = models.CharField(
         max_length=20, blank=True, default="", help_text="서비스 상에서 사용되는 이름"
     )
@@ -131,6 +131,8 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
         default=False,
         help_text=_("Designates whether the user can log into this admin site."),
     )
+
+    is_active = None
 
     objects = UserManager()
 
@@ -185,15 +187,14 @@ class University(TimeStampMixin):
 
 
 class UserNotification(TimeStampMixin):
-
-    FRIEND_REQUEST_RECEIVED = "Friend Request Received"
-    FRIEND_REQUEST_ACCEPTED = "Friend Request Accepted"
-    JOIN_REQUEST_RECEIVED = "Join Request Received"
-    JOIN_REQUEST_ACCEPTED = "Join Request Accepted"
-    JOIN_REQUEST_REFUSED = "Join Request Refused"
-    GENERAL = "General"
-    PROMOTION = "Promotion"
-    OTHER = "Other"
+    FRIEND_REQUEST_RECEIVED = "FRIEND REQUEST RECEIVED"
+    FRIEND_REQUEST_ACCEPTED = "FRIEND REQUEST ACCEPTED"
+    JOIN_REQUEST_RECEIVED = "JOIN REQUEST RECEIVED"
+    JOIN_REQUEST_ACCEPTED = "JOIN REQUEST ACCEPTED"
+    JOIN_REQUEST_REFUSED = "JOIN REQUEST REFUSED"
+    GENERAL = "GENERAL"
+    PROMOTION = "PROMOTION"
+    OTHER = "OTHER"
 
     NOTIFICATION_TYPE = (
         (FRIEND_REQUEST_RECEIVED, "FRIEND REQUEST RECEIVED"),
@@ -214,3 +215,32 @@ class UserNotification(TimeStampMixin):
 
     class Meta:
         db_table = "user_notification"
+
+
+class UniversityManualVerification(TimeStampMixin):
+    STUDENT_ID = "STUDENT ID"
+    PROOF_OF_ENROLLMENT = "PROOF OF ENROLLMENT"
+    PROOF_OF_ACCEPTANCE = "PROOF OF ACCEPTANCE"
+
+    VERIFICATION_METHOD = (
+        (STUDENT_ID, "STUDENT ID"),
+        (PROOF_OF_ENROLLMENT, "PROOF OF ENROLLMENT"),
+        (PROOF_OF_ACCEPTANCE, "PROOF OF ACCEPTANCE"),
+    )
+
+    REFUSED = "REFUSED"
+    ACCEPTED = "ACCEPTED"
+    PENDING = "PENDING"
+    VERIFICATION_STATUS = (
+        (REFUSED, "REFUSED"),
+        (ACCEPTED, "ACCEPTED"),
+        (PENDING, "PENDING"),
+    )
+
+    id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    university = models.ForeignKey(University, on_delete=models.DO_NOTHING)
+    verification_method = models.CharField(choices=VERIFICATION_METHOD, max_length=20)
+    verification_img_url = models.URLField(max_length=256, blank=True, default="")
+    verification_status = models.CharField(choices=VERIFICATION_STATUS, default=PENDING, max_length=15)
+    status_changed_at = models.DateTimeField(null=True)

@@ -1,9 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from rest_framework.fields import CurrentUserDefault
 
-from friend.models import Friend
-from user.models import University
+from user.models import University, UniversityManualVerification
 
 User = get_user_model()
 
@@ -15,15 +13,14 @@ class UniversitySerializer(serializers.HyperlinkedModelSerializer):
         read_only_fields = ["id", "name", "created_at", "updated_at"]
 
 
-class MiniUniversitySerializer(serializers.HyperlinkedModelSerializer):
+class MiniUniversitySerializer(serializers.ModelSerializer):
     class Meta:
         model = University
-        fields = ["url", "id", "name"]
-        read_only_fields = ["url", "id", "name"]
+        fields = ["id", "name"]
+        read_only_fields = ["id", "name"]
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-
+class UserSerializer(serializers.ModelSerializer):
     university = MiniUniversitySerializer(read_only=True)
     bookmarks = serializers.HyperlinkedRelatedField(
         many=True, read_only=True, view_name="group-bookmark-detail"
@@ -34,7 +31,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         fields = [
             "id",
             "email",
-            "name",
             "nickname",
             "gender",
             "university",
@@ -42,41 +38,44 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             "university_confirmed_at",
             "admission_class",
             "grade",
+            "bookmarks",
             "profile_image_url",
             "thumbnail_image_url",
-            "bookmarks",
-            "is_push_allowed",
-            "push_id",
             "login_attempt_at",
             "last_login_at",
             "auth_token",
             "is_service_terms_agreed",
+            "is_push_allowed",
+            "push_id",
             "is_deleted",
+            "created_at",
+            "updated_at",
         ]
         # api 로 get 만 할 필드
         read_only_fields = [
             "id",
-            "name",
-            "gender" "admission_class",
-            "profile_image_url",
-            "thumbnail_image_url",
-            "push_id",
+            "nickname",
+            "gender",
+            "university_confirmed_at",
+            "bookmarks",
             "login_attempt_at",
             "last_login_at",
             "auth_token",
             "is_service_terms_agreed",
+            "is_push_allowed",
+            "push_id",
             "is_deleted",
+            "created_at",
+            "updated_at",
         ]
 
 
-class SimplifiedUserSerializer(serializers.HyperlinkedModelSerializer):
+class SimplifiedUserSerializer(serializers.ModelSerializer):
     university = MiniUniversitySerializer(read_only=True)
-    is_friend = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = [
-            "url",
             "id",
             "email",
             "nickname",
@@ -85,10 +84,10 @@ class SimplifiedUserSerializer(serializers.HyperlinkedModelSerializer):
             "grade",
             "profile_image_url",
             "thumbnail_image_url",
-            "is_friend",
+            "created_at",
+            "updated_at",
         ]
         read_only_fields = [
-            "url",
             "id",
             "email",
             "nickname",
@@ -97,13 +96,35 @@ class SimplifiedUserSerializer(serializers.HyperlinkedModelSerializer):
             "grade",
             "profile_image_url",
             "thumbnail_image_url",
-            "is_friend",
+            "created_at",
+            "updated_at",
         ]
 
-    def get_is_friend(self, obj):
-        user = CurrentUserDefault()
-        friend = Friend.objects.filter(user=user, friend_id=obj.id).first()
-        if friend:
-            return True
-        else:
-            return False
+
+class UniversityVerificationSerializer(serializers.ModelSerializer):
+    university = MiniUniversitySerializer(read_only=True)
+    user = SimplifiedUserSerializer(read_only=True)
+
+    class Meta:
+        model = UniversityManualVerification
+        fields = [
+            "id",
+            "user",
+            "university",
+            "verification_method",
+            "verification_img_url",
+            "verification_status",
+            "status_changed_at",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = [
+            "id",
+            "user",
+            "university",
+            "verification_method",
+            "verification_img_url",
+            "status_changed_at",
+            "created_at",
+            "updated_at",
+        ]
