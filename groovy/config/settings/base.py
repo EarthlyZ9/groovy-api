@@ -1,11 +1,11 @@
 """
 Django settings for friggs idoctor project.
 """
-import sys
 import datetime
+import sys
 from pathlib import Path
-from .env import get_env_value
 
+from .env import get_env_value
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -163,9 +163,9 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.BasicAuthentication",
     ),
-    # "DEFAULT_RENDERER_CLASSES": [
-    # 'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
-    # ],
+    "DEFAULT_RENDERER_CLASSES": [
+        'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
+    ],
     "DEFAULT_PARSER_CLASSES": [
         "rest_framework.parsers.JSONParser",
         "rest_framework.parsers.FormParser",
