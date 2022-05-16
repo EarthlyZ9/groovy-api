@@ -64,6 +64,9 @@ class BasicSignUpView(APIView):
 
 
 class EmailVerification(APIView):
+    """
+    유효한 이메일인지 확인하기 위해 이메일 전송
+    """
     permission_classes = [permissions.AllowAny]
 
     def post(self, request, *args, **kwargs):
@@ -114,6 +117,7 @@ class SecessionView(generics.DestroyAPIView, mixins.UpdateModelMixin):
         """
         perform soft delete
         """
+        # TODO: soft delete user
         pass
 
     def update(self, request, *args, **kwargs):

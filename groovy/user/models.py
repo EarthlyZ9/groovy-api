@@ -7,8 +7,10 @@ from django.core.mail import send_mail
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from config.softdelete import SoftDeleteModel, SoftDeleteManager
 
-class UserManager(BaseUserManager):
+
+class UserManager(BaseUserManager, SoftDeleteManager):
     """
     Custom user model manager where email is the unique identifiers
     for authentication instead of usernames.
@@ -17,8 +19,8 @@ class UserManager(BaseUserManager):
     use_in_migrations = True
 
     def create_user(
-        self,
-        email=None,
+            self,
+            email=None,
         password=None,
         **extra_fields,
     ):
@@ -64,8 +66,7 @@ class TimeStampMixin(models.Model):
         abstract = True
 
 
-class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
-
+class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin, SoftDeleteModel):
     MALE = "MALE"
     FEMALE = "FEMALE"
     GENDER_CHOICES = (
@@ -121,11 +122,10 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin):
     app_version = models.CharField(null=True, max_length=16)
     auth_token = models.CharField(null=True, max_length=128)
 
-    is_deleted = models.BooleanField(default=False)
+    # deleted_at
     deleted_reason = models.CharField(
         choices=DELETE_REASONS, max_length=255, blank=True, null=True
     )
-    deleted_at = models.DateTimeField(null=True)
 
     is_staff = models.BooleanField(
         _("staff status"),

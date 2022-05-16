@@ -47,7 +47,7 @@ class UserSerializer(serializers.ModelSerializer):
             "is_service_terms_agreed",
             "is_push_allowed",
             "push_id",
-            "is_deleted",
+            "deleted_at",
             "created_at",
             "updated_at",
         ]
@@ -64,7 +64,7 @@ class UserSerializer(serializers.ModelSerializer):
             "is_service_terms_agreed",
             "is_push_allowed",
             "push_id",
-            "is_deleted",
+            "deleted_at",
             "created_at",
             "updated_at",
         ]
