@@ -6,8 +6,7 @@ from django.contrib.auth.models import PermissionsMixin
 from django.core.mail import send_mail
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
-from config.softdelete import SoftDeleteModel, SoftDeleteManager
+from softdelete.models import SoftDeleteManager, SoftDeleteObject
 
 
 class UserManager(BaseUserManager, SoftDeleteManager):
@@ -66,7 +65,7 @@ class TimeStampMixin(models.Model):
         abstract = True
 
 
-class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin, SoftDeleteModel):
+class User(AbstractBaseUser, PermissionsMixin, TimeStampMixin, SoftDeleteObject):
     MALE = "MALE"
     FEMALE = "FEMALE"
     GENDER_CHOICES = (
