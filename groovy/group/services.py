@@ -13,6 +13,13 @@ class GroupService:
         return GroupMember.objects.create(group=group, member=member)
 
     @staticmethod
+    def delete_group_member(group, member):
+        obj = GroupMember.objects.filter(group=group, member=member).first()
+        obj.delete()
+        if obj.DoesNotExist:
+            return True
+
+    @staticmethod
     def create_bookmark(user, group_id):
         return GroupBookmark.objects.create(user=user, group_id=group_id)
 

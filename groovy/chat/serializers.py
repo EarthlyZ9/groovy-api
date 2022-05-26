@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
-from chat.models import GroupChatroom, GroupChat, PersonalChatroom, PersonalChat, GroupChatroomNotice, \
-    PersonalChatroomNotice
+from chat.models import GroupChatroom, GroupChat, PersonalChatroom, PersonalChat, GroupChatroomNotice
 from group.serializers import MiniGroupSerializer
 from user.serializers import SimplifiedUserSerializer
 
@@ -9,6 +8,7 @@ from user.serializers import SimplifiedUserSerializer
 class GroupChatroomSerializer(serializers.ModelSerializer):
     group = MiniGroupSerializer(read_only=True)
     latest_chat = serializers.SerializerMethodField()
+    notice = serializers.SerializerMethodField()
 
     class Meta:
         model = GroupChatroom
@@ -16,6 +16,7 @@ class GroupChatroomSerializer(serializers.ModelSerializer):
             "id",
             "group",
             "latest_chat",
+            "notice",
             "created_at",
             "updated_at",
         ]
@@ -32,6 +33,10 @@ class GroupChatroomSerializer(serializers.ModelSerializer):
             GroupChat.objects.filter(chatroom_id=obj.id).order_by("created_at").first()
         )
         return GroupChatSerializer(instance).data
+
+    def get_notice(self, obj):
+        instance = GroupChatroomNotice.objects.filter(chatroom_id=obj.id).first()
+        return GroupChatroomNoticeSerializer(instance).data
 
 
 class GroupChatSerializer(serializers.ModelSerializer):
@@ -124,22 +129,6 @@ class GroupChatroomNoticeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GroupChatroomNotice
-        fields = [
-            "id",
-            "chatroom",
-            "pinned_chat",
-        ]
-        read_only_fields = [
-            "id",
-            "chatroom",
-        ]
-
-
-class PersonalChatroomNoticeSerializer(serializers.ModelSerializer):
-    pinned_chat = PersonalChatSerializer(read_only=True)
-
-    class Meta:
-        model = PersonalChatroomNotice
         fields = [
             "id",
             "chatroom",

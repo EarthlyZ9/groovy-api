@@ -3,6 +3,12 @@ from django.db import models
 from group.models import Group
 from user.models import User, TimeStampMixin
 
+"""
+그룹 채팅
+"""
+
+
+# TODO: Implement soft delete for Group app Models
 
 class GroupChatroom(TimeStampMixin):
     id = models.BigAutoField(primary_key=True)
@@ -30,12 +36,28 @@ class GroupChat(TimeStampMixin):
         return f"GroupChat(id={self.id}, chatroom={self.chatroom}, user={self.user})"
 
 
+class GroupChatroomNotice(TimeStampMixin):
+    id = models.BigAutoField(primary_key=True)
+    chatroom = models.ForeignKey(GroupChatroom, on_delete=models.CASCADE, related_name="notice")
+    pinned_chat = models.ForeignKey(GroupChat, on_delete=models.SET_NULL, null=True, blank=True,
+                                    related_name="pinned_chat")
+
+    class Meta:
+        db_table = "group_chatroom_notice"
+
+
+"""
+개인 채팅
+"""
+
+
 def user_inexistent():
     # TODO: 존재하지 않는 유저일 때
     pass
 
 
 class PersonalChatroom(TimeStampMixin):
+    # TODO: SET Action
     id = models.BigAutoField(primary_key=True)
     sender = models.ForeignKey(
         User,
@@ -76,17 +98,3 @@ class PersonalChat(TimeStampMixin):
 
     def __repr__(self):
         return f"PersonalChat(id={self.id}, sender={self.sender}, receiver={self.receiver})"
-
-
-class GroupChatroomNotice(TimeStampMixin):
-    id = models.BigAutoField(primary_key=True)
-    chatroom = models.ForeignKey(GroupChatroom, on_delete=models.CASCADE, related_name="notice")
-    pinned_chat = models.ForeignKey(GroupChat, on_delete=models.SET_NULL, null=True, blank=True,
-                                    related_name="pinned_chat")
-
-
-class PersonalChatroomNotice(TimeStampMixin):
-    id = models.BigAutoField(primary_key=True)
-    chatroom = models.ForeignKey(PersonalChatroom, on_delete=models.CASCADE, related_name="notice")
-    pinned_chat = models.ForeignKey(PersonalChat, on_delete=models.SET_NULL, null=True, blank=True,
-                                    related_name="pinned_chat")
