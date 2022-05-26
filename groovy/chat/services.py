@@ -25,6 +25,8 @@ class ChatService:
         group_chatroom_queryset = group_chatroom_queryset.order_by('updated_at')
         return group_chatroom_queryset
 
+    # TODO: Test with Datagrip (dummy data)
+
     @staticmethod
     def get_personal_chatroom_queryset(user):
         personal_chat_queryset = PersonalChatroom.objects.filter(
@@ -34,13 +36,17 @@ class ChatService:
 
     @staticmethod
     def get_all_group_chats(chatroom_id):
-        return GroupChat.objects.filter(id=chatroom_id).order_by('-created_at')
+        return GroupChat.objects.all_with_deleted().filter(id=chatroom_id).order_by('-created_at')
 
     @staticmethod
     def get_all_personal_chats(chatroom_id):
-        return PersonalChat.objects.filter(id=chatroom_id).order_by('-created_at')
+        return PersonalChat.objects.all_with_deleted().filter(id=chatroom_id).order_by('-created_at')
 
     @staticmethod
     def delete_notice(obj):
         obj.pinned_chat = None
         return obj
+
+    @staticmethod
+    def create_chatroom():
+        pass

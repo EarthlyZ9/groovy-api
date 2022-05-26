@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from chat.services import ChatService
 from group.models import GroupJoinRequest, GroupMember, GroupBookmark
 
 
@@ -10,6 +11,12 @@ class GroupService:
 
     @staticmethod
     def add_group_member(group, member):
+        try:
+            group_member = GroupMember.objects.get(group=group)
+        except GroupMember.DoesNotExist:
+            # 멤버가 1명 이상이 되면 자동으로 그룹 채팅방을 만듦
+            ChatService.create_chatroom()
+
         return GroupMember.objects.create(group=group, member=member)
 
     @staticmethod

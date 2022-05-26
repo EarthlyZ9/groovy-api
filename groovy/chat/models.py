@@ -1,4 +1,5 @@
 from django.db import models
+from softdelete.models import SoftDeleteObject
 
 from group.models import Group
 from user.models import User, TimeStampMixin
@@ -8,9 +9,7 @@ from user.models import User, TimeStampMixin
 """
 
 
-# TODO: Implement soft delete for Group app Models
-
-class GroupChatroom(TimeStampMixin):
+class GroupChatroom(TimeStampMixin, SoftDeleteObject):
     id = models.BigAutoField(primary_key=True)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="group_chatroom")
 
@@ -21,7 +20,7 @@ class GroupChatroom(TimeStampMixin):
         return f"GroupChatroom({self.id}, {self.group})"
 
 
-class GroupChat(TimeStampMixin):
+class GroupChat(TimeStampMixin, SoftDeleteObject):
     id = models.BigAutoField(primary_key=True)
     chatroom = models.ForeignKey(
         GroupChatroom, on_delete=models.CASCADE, related_name="latest_chat"
@@ -36,7 +35,7 @@ class GroupChat(TimeStampMixin):
         return f"GroupChat(id={self.id}, chatroom={self.chatroom}, user={self.user})"
 
 
-class GroupChatroomNotice(TimeStampMixin):
+class GroupChatroomNotice(TimeStampMixin, SoftDeleteObject):
     id = models.BigAutoField(primary_key=True)
     chatroom = models.ForeignKey(GroupChatroom, on_delete=models.CASCADE, related_name="notice")
     pinned_chat = models.ForeignKey(GroupChat, on_delete=models.SET_NULL, null=True, blank=True,
@@ -56,7 +55,7 @@ def user_inexistent():
     pass
 
 
-class PersonalChatroom(TimeStampMixin):
+class PersonalChatroom(TimeStampMixin, SoftDeleteObject):
     # TODO: SET Action
     id = models.BigAutoField(primary_key=True)
     sender = models.ForeignKey(
@@ -79,7 +78,7 @@ class PersonalChatroom(TimeStampMixin):
         ]
 
 
-class PersonalChat(TimeStampMixin):
+class PersonalChat(TimeStampMixin, SoftDeleteObject):
     id = models.BigAutoField(primary_key=True)
     chatroom = models.ForeignKey(
         PersonalChatroom, on_delete=models.DO_NOTHING, related_name="chatroom"
