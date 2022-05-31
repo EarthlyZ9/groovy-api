@@ -1,7 +1,5 @@
 from rest_framework import permissions
 
-from group.models import GroupMember
-
 
 class IsManagerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
@@ -29,13 +27,3 @@ class IsBookmarkOwner(permissions.BasePermission):
         else:
             return obj.user == request.user
 
-
-class IsManagerOrMember(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        queryset = GroupMember.objects.fiter(group=obj.group, member=request.user)
-
-        if request.method in permissions.SAFE_METHODS:
-            if queryset:
-                return True
-        else:
-            return queryset.first().is_manager

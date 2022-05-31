@@ -1,19 +1,20 @@
 from rest_framework import serializers
 
-from group.models import Group, GroupJoinRequest, GroupMember, GroupBookmark
+from group.models import Group, GroupJoinRequest, GroupBookmark
 from user.serializers import SimplifiedUserSerializer
 
 
 class GroupSerializer(serializers.ModelSerializer):
     manager = SimplifiedUserSerializer(read_only=True)
-    members = serializers.RelatedField(
+    member = serializers.PrimaryKeyRelatedField(
         many=True, read_only=True
     )
-    members_count = serializers.IntegerField(source="members.count", read_only=True)
-    bookmarks = serializers.RelatedField(
-        many=True, read_only=True
-    )
-    bookmarks_count = serializers.IntegerField(source="bookmarks.count", read_only=True)
+    members_count = serializers.IntegerField(source="member.count", read_only=True)
+
+    # bookmarks = serializers.RelatedField(
+    #     many=True, read_only=True
+    # )
+    # bookmarks_count = serializers.IntegerField(source="bookmarks.count", read_only=True)
 
     class Meta:
         model = Group
@@ -26,10 +27,10 @@ class GroupSerializer(serializers.ModelSerializer):
             "has_no_quota",
             "is_approval_needed",
             "status",
-            "members",
+            "member",
             "members_count",
-            "bookmarks",
-            "bookmarks_count",
+            # "bookmarks",
+            # "bookmarks_count",
             "created_at",
             "updated_at",
         ]
@@ -37,8 +38,8 @@ class GroupSerializer(serializers.ModelSerializer):
             "id",
             "manager",
             "members_count",
-            "bookmarks",
-            "bookmarks_count",
+            # "bookmarks",
+            # "bookmarks_count",
             "created_at",
             "updated_at",
         ]
@@ -100,26 +101,26 @@ class GroupJoinRequestSerializer(serializers.ModelSerializer):
         ]
 
 
-class GroupMemberSerializer(serializers.ModelSerializer):
-    group = MiniGroupSerializer(read_only=True)
-    member = SimplifiedUserSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = GroupMember
-        fields = [
-            "id",
-            "group",
-            "member",
-            "created_at",
-            "updated_at",
-        ]
-
-        read_only_fields = [
-            "id",
-            "group",
-            "created_at",
-            "updated_at",
-        ]
+# class GroupMemberSerializer(serializers.ModelSerializer):
+#     group = MiniGroupSerializer(read_only=True)
+#     member = SimplifiedUserSerializer(many=True, read_only=True)
+#
+#     class Meta:
+#         model = GroupMember
+#         fields = [
+#             "id",
+#             "group",
+#             "member",
+#             "created_at",
+#             "updated_at",
+#         ]
+#
+#         read_only_fields = [
+#             "id",
+#             "group",
+#             "created_at",
+#             "updated_at",
+#         ]
 
 
 class GroupBookmarkSerializer(serializers.ModelSerializer):

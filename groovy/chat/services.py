@@ -48,5 +48,5 @@ class ChatService:
         return obj
 
     @staticmethod
-    def create_chatroom():
-        pass
+    def create_group_chatroom(group):
+        return GroupChatroom.objects.create(group=group)

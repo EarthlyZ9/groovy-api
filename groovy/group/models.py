@@ -1,10 +1,9 @@
-from softdelete.models import SoftDeleteObject
 from django.db import models
+
 from user.models import User, TimeStampMixin
 
 
-class Group(TimeStampMixin, SoftDeleteObject):
-
+class Group(TimeStampMixin):
     OPENED = "OPENED"
     CLOSED = "CLOSED"
     FULL = "FULL"
@@ -24,6 +23,7 @@ class Group(TimeStampMixin, SoftDeleteObject):
     quota = models.PositiveSmallIntegerField(null=True, blank=True)
     has_no_quota = models.BooleanField(default=False)
     is_approval_needed = models.BooleanField(default=True)
+    member = models.ManyToManyField(User, related_name='members', null=True, blank=True)
     status = models.CharField(
         choices=GROUP_STATUS, default=GROUP_STATUS[0][0], max_length=10
     )
@@ -36,8 +36,7 @@ class Group(TimeStampMixin, SoftDeleteObject):
         return f"Group({self.id}, {self.title})"
 
 
-class GroupJoinRequest(TimeStampMixin, SoftDeleteObject):
-
+class GroupJoinRequest(TimeStampMixin):
     REFUSED = "REFUSED"
     ACCEPTED = "ACCEPTED"
     PENDING = "PENDING"
@@ -64,20 +63,23 @@ class GroupJoinRequest(TimeStampMixin, SoftDeleteObject):
         return f"JoinRequest(id={self.id}, user={self.requestor}, to={self.group})"
 
 
-class GroupMember(TimeStampMixin, SoftDeleteObject):
-    id = models.BigAutoField(primary_key=True)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="members")
-    member = models.ManyToManyField(User, related_name="members")
-    is_manager = models.BooleanField(default=False)
-
-    class Meta:
-        db_table = "group_member"
-
-    def __repr__(self):
-        return f"GroupMember(id={self.id}, group={self.group}, member={self.member})"
+# TODO: GroupMember 중개모델 말고 ManyToManyField 쓰기
 
 
-class GroupBookmark(TimeStampMixin, SoftDeleteObject):
+# class GroupMember(TimeStampMixin, SoftDeleteObject):
+#     id = models.BigAutoField(primary_key=True)
+#     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="members_to")
+#     member = models.ManyToManyField(User, related_name="members")
+#     is_manager = models.BooleanField(default=False)
+#
+#     class Meta:
+#         db_table = "group_member"
+#
+#     def __repr__(self):
+#         return f"GroupMember(id={self.id}, group={self.group}, member={self.member})"
+
+
+class GroupBookmark(TimeStampMixin):
     id = models.BigAutoField(primary_key=True)
     user = models.ManyToManyField(User, related_name="bookmarks")
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="bookmarks")

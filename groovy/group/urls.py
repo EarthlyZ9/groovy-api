@@ -5,7 +5,6 @@ from .views import (
     GroupDetail,
     GroupJoinRequestList,
     GroupJoinRequestDetail,
-    GroupMemberList,
     GroupBookmarkList,
     GroupBookmarkDetail,
 )
@@ -13,9 +12,6 @@ from .views import (
 urlpatterns = [
     path("", GroupList.as_view(), name="group-list"),
     path("<int:pk>/", GroupDetail.as_view(), name="group-detail"),
-    path(
-        "<int:pk>/group-members/", GroupMemberList.as_view(), name="group-member-list"
-    ),
     path(
         "<int:pk>/join-requests/",
         GroupJoinRequestList.as_view(),
