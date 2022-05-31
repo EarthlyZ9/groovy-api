@@ -1,8 +1,9 @@
+from softdelete.models import SoftDeleteObject
 from django.db import models
 from user.models import User, TimeStampMixin
 
 
-class Group(TimeStampMixin):
+class Group(TimeStampMixin, SoftDeleteObject):
 
     OPENED = "OPENED"
     CLOSED = "CLOSED"
@@ -35,7 +36,7 @@ class Group(TimeStampMixin):
         return f"Group({self.id}, {self.title})"
 
 
-class GroupJoinRequest(TimeStampMixin):
+class GroupJoinRequest(TimeStampMixin, SoftDeleteObject):
 
     REFUSED = "REFUSED"
     ACCEPTED = "ACCEPTED"
@@ -63,7 +64,7 @@ class GroupJoinRequest(TimeStampMixin):
         return f"JoinRequest(id={self.id}, user={self.requestor}, to={self.group})"
 
 
-class GroupMember(TimeStampMixin):
+class GroupMember(TimeStampMixin, SoftDeleteObject):
     id = models.BigAutoField(primary_key=True)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="members")
     member = models.ManyToManyField(User, related_name="members")
@@ -76,7 +77,7 @@ class GroupMember(TimeStampMixin):
         return f"GroupMember(id={self.id}, group={self.group}, member={self.member})"
 
 
-class GroupBookmark(TimeStampMixin):
+class GroupBookmark(TimeStampMixin, SoftDeleteObject):
     id = models.BigAutoField(primary_key=True)
     user = models.ManyToManyField(User, related_name="bookmarks")
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="bookmarks")
