@@ -97,7 +97,7 @@ class BasicSignInView(TokenObtainPairView):
             raise exceptions.ParseError("invalid input form given")
 
         user = get_object_or_404(User, email=email)
-        if not user.is_deleted:
+        if user.deleted_at:
             raise serializers.ValidationError("비활성화된 계정입니다.")
         elif not check_password(password, user.password):
             raise serializers.ValidationError("잘못된 비밀번호입니다.")
